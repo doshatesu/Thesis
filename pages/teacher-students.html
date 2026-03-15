@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Students - ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
 </head>
 <body>
 <div class="demo-banner">ReadWise System | Pulo National High School</div>
@@ -14,16 +14,16 @@
       <div class="logo-mark">RW</div><h2>ReadWise</h2><p>Teacher Portal</p>
     </div>
     <nav>
-      <a href="teacher-dashboard.html"><span class="icon"></span> Dashboard</a>
-      <a href="teacher-passages.html"><span class="icon"></span> Passage Library</a>
-      <a href="teacher-submit.html"><span class="icon"></span> Submit Passage</a>
-      <a href="teacher-students.html" class="active"><span class="icon"></span> Students</a>
-      <a href="teacher-recommendations.html"><span class="icon"></span> Recommendations</a>
-      <a href="teacher-reports.html"><span class="icon"></span> Reports</a>
+      <a href="teacher-dashboard.html"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="teacher-passages.html"><span class="icon" data-icon="library"></span><span class="nav-label">Passage Library</span></a>
+      <a href="teacher-submit.html"><span class="icon" data-icon="submit"></span><span class="nav-label">Submit Passage</span></a>
+      <a href="teacher-students.html" class="active"><span class="icon" data-icon="students"></span><span class="nav-label">Students</span></a>
+      <a href="teacher-recommendations.html"><span class="icon" data-icon="recommendations"></span><span class="nav-label">Recommendations</span></a>
+      <a href="teacher-reports.html"><span class="icon" data-icon="reports"></span><span class="nav-label">Reports</span></a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info"><strong>Ms. Ana Villanueva</strong>Grade 7 English</div>
-      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'">Logout</button>
+      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
@@ -44,7 +44,7 @@
     </div>
   </main>
 </div>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   const tbody = document.getElementById("students-table");
   MOCK.students.forEach((s, i) => {
@@ -72,3 +72,5 @@
 </script>
 </body>
 </html>
+
+

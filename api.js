@@ -4,6 +4,7 @@
   var RAW_BASE = global.READWISE_API_BASE_URL || ("http://" + defaultHost + ":5000");
   var BASE_URL = String(RAW_BASE).replace(/\/+$/, "");
   var ACTIVE_WEEK_KEY = "readwise_active_week_v1";
+  var USER_CACHE_KEY = "readwise_user_v1";
   var TOTAL_WEEKS = 8;
 
   function normalizeWeek(value) {
@@ -36,6 +37,47 @@
     return BASE_URL + path;
   }
 
+  function emitUserCacheChange(user) {
+    if (typeof global.CustomEvent !== "function" || typeof global.dispatchEvent !== "function") return;
+    global.dispatchEvent(new CustomEvent("readwise:usercachechange", {
+      detail: { user: user || null }
+    }));
+  }
+
+  function getCachedUser() {
+    try {
+      var raw = global.localStorage.getItem(USER_CACHE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function cacheUser(user) {
+    try {
+      if (user && typeof user === "object") {
+        global.localStorage.setItem(USER_CACHE_KEY, JSON.stringify(user));
+      } else {
+        global.localStorage.removeItem(USER_CACHE_KEY);
+      }
+    } catch (error) {
+      // ignore storage errors
+    }
+    emitUserCacheChange(user || null);
+    return user || null;
+  }
+
+  function clearCachedUser() {
+    try {
+      global.localStorage.removeItem(USER_CACHE_KEY);
+    } catch (error) {
+      // ignore storage errors
+    }
+    emitUserCacheChange(null);
+  }
+
   async function request(path, options) {
     var settings = options || {};
     var headers = Object.assign({}, settings.headers || {});
@@ -61,6 +103,7 @@
     }
 
     if (!response.ok) {
+      if (response.status === 401) clearCachedUser();
       throw new Error((payload && payload.error) || ("Request failed (" + response.status + ")"));
     }
 
@@ -89,19 +132,32 @@
     baseUrl: BASE_URL,
     getActiveWeek: getActiveWeek,
     setActiveWeek: setActiveWeek,
+    getCachedUser: getCachedUser,
     request: request,
     predict: predict,
     login: function(email, password, role) {
       return request("/api/auth/login", {
         method: "POST",
         body: { email: email, password: password, role: role }
+      }).then(function(data) {
+        if (data && data.user) cacheUser(data.user);
+        return data;
       });
     },
     logout: function() {
-      return request("/api/auth/logout", { method: "POST" });
+      return request("/api/auth/logout", { method: "POST" }).then(function(data) {
+        clearCachedUser();
+        return data;
+      }, function(error) {
+        clearCachedUser();
+        throw error;
+      });
     },
     me: function() {
-      return request("/api/auth/me");
+      return request("/api/auth/me").then(function(data) {
+        if (data && data.user) cacheUser(data.user);
+        return data;
+      });
     },
     getPassages: function() {
       return request("/api/passages");
@@ -147,6 +203,12 @@
     },
     getStudentProgress: function() {
       return request("/api/student/progress");
+    },
+    updateStudentAvatar: function(payload) {
+      return request("/api/student/profile/avatar", { method: "PUT", body: payload }).then(function(data) {
+        if (data && data.user) cacheUser(data.user);
+        return data;
+      });
     }
   };
 })(window);

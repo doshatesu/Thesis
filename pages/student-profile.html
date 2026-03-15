@@ -1,178 +1,116 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Profile - ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
-  <style>
-    .avatar-wrap {
-      position: relative;
-      width: 90px;
-      height: 90px;
-      flex-shrink: 0;
-    }
-    .avatar-wrap img,
-    .avatar-wrap .avatar-initials {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--primary);
-    }
-    .avatar-wrap .avatar-initials {
-      background: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      font-weight: 800;
-      color: #fff;
-    }
-    .avatar-upload-btn {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 28px;
-      height: 28px;
-      background: var(--secondary);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 14px;
-      border: 2px solid #fff;
-      transition: .2s;
-    }
-    .avatar-upload-btn:hover { background: var(--primary); }
-    .avatar-upload-btn svg {
-      width: 14px;
-      height: 14px;
-      stroke: #fff;
-      stroke-width: 1.9;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-    #avatar-file-input { display: none; }
-
-    .remove-photo-btn {
-      font-size: 12px;
-      color: var(--hard);
-      background: none;
-      border: none;
-      cursor: pointer;
-      text-decoration: underline;
-      margin-top: 6px;
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
 </head>
-<body>
+<body class="student-profile-page">
 <div class="demo-banner">ReadWise System | Pulo National High School</div>
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-mark">RW</div><h2>ReadWise</h2><p>Student Portal</p>
+      <div class="logo-mark">RW</div>
+      <h2>ReadWise</h2>
+      <p>Student Portal</p>
     </div>
     <nav>
-          <a href="student-profile.html" class="active"><span class="icon"></span> My Profile</a>
-      <a href="student-dashboard.html"><span class="icon"></span> Dashboard</a>
-      <a href="student-passage.html"><span class="icon"></span> My Passage</a>
-      <a href="student-progress.html"><span class="icon"></span> My Progress</a>
-      <a href="student-pre-assessment.html"><span class="icon"></span> Pre-Assessment</a>
-    
+      <a href="student-profile.html" class="active"><span class="icon" data-icon="profile"></span><span class="nav-label">My Profile</span></a>
+      <a href="student-dashboard.html"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="student-passage.html"><span class="icon" data-icon="passage"></span><span class="nav-label">My Passage</span></a>
+      <a href="student-progress.html"><span class="icon" data-icon="progress"></span><span class="nav-label">My Progress</span></a>
+      <a href="student-pre-assessment.html"><span class="icon" data-icon="assessment"></span><span class="nav-label">Pre-Assessment</span></a>
     </nav>
     <div class="sidebar-footer">
-      <div class="user-info"><strong id="sb-name">-</strong>Grade 7</div>
-      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'">Logout</button>
+      <div class="user-info">
+        <strong id="sb-name">-</strong>
+        <span id="sb-meta">Grade 7 | Sampaguita</span>
+      </div>
+      <button class="logout-btn" onclick="logout()" type="button"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
+
   <main class="main">
-    <div class="page-header">
-      <h1>My Profile</h1>
-      <p>Your account information and reading program details</p>
+    <div class="page-header page-header-split">
+      <div class="page-header-copy">
+        <p class="eyebrow">Student workspace</p>
+        <h1>My Profile</h1>
+        <p>Keep your learning identity up to date, review your reading trend, and manage the avatar that follows you through the student workspace.</p>
+      </div>
+      <div class="header-meta">
+        <span class="meta-pill"><strong>Profile tools</strong> Click the camera to change your avatar</span>
+      </div>
     </div>
 
-    <div class="card-grid card-grid-2" style="margin-bottom:16px;align-items:start">
-
-      <!-- Left: Identity -->
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:18px;margin-bottom:20px;
-          padding-bottom:20px;border-bottom:1px solid var(--border)">
-
-          <!-- Avatar with upload button -->
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+    <div class="card-grid card-grid-2 profile-shell">
+      <section class="card profile-identity-card">
+        <div class="profile-hero">
+          <div class="profile-avatar-stack">
             <div class="avatar-wrap">
-              <!-- Shows either uploaded photo or initials -->
               <div class="avatar-initials" id="avatar-initials">-</div>
-              <img id="avatar-img" src="" alt="Profile Photo"
-                style="display:none;width:90px;height:90px;border-radius:50%;
-                  object-fit:cover;border:3px solid var(--primary);">
-              <!-- Camera icon button -->
-              <label class="avatar-upload-btn" for="avatar-file-input" title="Upload photo">
+              <img id="avatar-img" src="" alt="Profile avatar" style="display:none;">
+              <button class="avatar-upload-btn" id="avatar-picker-btn" type="button" title="Change avatar">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                   <path d="M8 7.5l1.2-2h5.6l1.2 2H19a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.5a2 2 0 0 1 2-2Z"></path>
                   <circle cx="12" cy="13" r="3.5"></circle>
                 </svg>
-              </label>
-              <input type="file" id="avatar-file-input" accept="image/*">
+              </button>
             </div>
-            <button class="remove-photo-btn" id="remove-photo-btn" onclick="removePhoto()">
-              Remove photo
-            </button>
+            <input type="file" id="avatar-file-input" accept="image/*" hidden>
+            <span class="profile-avatar-status" id="avatar-status">Using initials</span>
+            <p class="profile-avatar-hint">Open the avatar picker to upload a photo, choose one of your SVG avatars, or go back to initials.</p>
           </div>
 
-          <div>
-            <div id="full-name" style="font-size:20px;font-weight:800;color:var(--secondary)">-</div>
-            <div style="font-size:13px;color:var(--muted);margin-top:3px">Grade 7 Student</div>
-            <div id="level-pill" style="margin-top:8px"></div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:0">
-          <div style="display:flex;justify-content:space-between;font-size:14px;
-            padding:11px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted);font-weight:600">Full Name</span>
-            <span id="info-name" style="font-weight:700;color:var(--secondary)">-</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:14px;
-            padding:11px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted);font-weight:600">Grade & Section</span>
-            <span id="info-grade" style="font-weight:700;color:var(--secondary)">-</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:14px;
-            padding:11px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted);font-weight:600">School</span>
-            <span style="font-weight:700;color:var(--secondary)">Pulo National High School</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:14px;
-            padding:11px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted);font-weight:600">Subject</span>
-            <span style="font-weight:700;color:var(--secondary)">English</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:14px;
-            padding:11px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted);font-weight:600">Teacher</span>
-            <span style="font-weight:700;color:var(--secondary)">Ms. Ana Villanueva</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:14px;
-            padding:11px 0">
-            <span style="color:var(--muted);font-weight:600">Program Week</span>
-            <span style="font-weight:700;color:var(--secondary)">Week 5 of 8</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: Stats -->
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="card">
-          <div class="section-title">Reading Statistics</div>
-          <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="profile-hero-copy">
             <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
-                <span style="color:var(--muted);font-weight:600">Pre-Assessment Score</span>
+              <p class="eyebrow">Profile</p>
+              <h2 class="profile-name" id="full-name">-</h2>
+              <p class="profile-subtitle" id="profile-summary">Grade 7 student</p>
+            </div>
+            <div class="profile-meta-pills">
+              <span class="meta-pill"><strong id="level-pill-label">-</strong> Current class</span>
+              <span class="meta-pill"><strong>PNHS</strong> English program</span>
+            </div>
+            <div id="level-pill"></div>
+          </div>
+        </div>
+
+        <div class="profile-details-list">
+          <div class="profile-detail-row">
+            <span class="profile-detail-label">Full Name</span>
+            <span class="profile-detail-value" id="info-name">-</span>
+          </div>
+          <div class="profile-detail-row">
+            <span class="profile-detail-label">Grade and Section</span>
+            <span class="profile-detail-value" id="info-grade">-</span>
+          </div>
+          <div class="profile-detail-row">
+            <span class="profile-detail-label">School</span>
+            <span class="profile-detail-value">Pulo National High School</span>
+          </div>
+          <div class="profile-detail-row">
+            <span class="profile-detail-label">Subject</span>
+            <span class="profile-detail-value">English</span>
+          </div>
+          <div class="profile-detail-row">
+            <span class="profile-detail-label">Teacher</span>
+            <span class="profile-detail-value">Ms. Ana Villanueva</span>
+          </div>
+          <div class="profile-detail-row">
+            <span class="profile-detail-label">Program Week</span>
+            <span class="profile-detail-value" id="program-week">Week 1 of 8</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="profile-side-column">
+        <section class="card">
+          <div class="section-title">Reading Statistics</div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div>
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:8px">
+                <span class="profile-detail-label">Pre-Assessment Score</span>
                 <strong id="stat-pre">-%</strong>
               </div>
               <div class="progress">
@@ -180,8 +118,8 @@
               </div>
             </div>
             <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
-                <span style="color:var(--muted);font-weight:600">Latest Session Score</span>
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:8px">
+                <span class="profile-detail-label">Latest Session Score</span>
                 <strong id="stat-latest">-%</strong>
               </div>
               <div class="progress">
@@ -189,8 +127,8 @@
               </div>
             </div>
             <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
-                <span style="color:var(--muted);font-weight:600">Best Score</span>
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:8px">
+                <span class="profile-detail-label">Best Score</span>
                 <strong id="stat-best">-%</strong>
               </div>
               <div class="progress">
@@ -198,147 +136,341 @@
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="card">
+        <section class="card">
           <div class="section-title">Reading Level History</div>
-          <div id="level-history" style="display:flex;flex-direction:column;gap:8px"></div>
-        </div>
+          <div id="level-history" class="profile-history-list"></div>
+        </section>
 
-        <div class="card" style="background:linear-gradient(135deg,var(--secondary),#1e4a8a);color:#fff">
-          <div style="font-size:13px;opacity:.75;margin-bottom:4px">Current System Recommendation</div>
-          <div id="rec-display" style="font-size:18px;font-weight:800">-</div>
-          <div style="font-size:12px;opacity:.65;margin-top:4px">Based on last 2 sessions | Teacher confirmed</div>
-        </div>
+        <section class="card profile-recommendation-card">
+          <div class="section-title">Current System Recommendation</div>
+          <p class="profile-recommendation-value" id="rec-display">-</p>
+          <p class="muted-copy" id="rec-note">Based on your latest sessions and current class performance.</p>
+        </section>
       </div>
     </div>
 
-    <!-- Demo credentials -->
-    <div class="card" style="border-left:4px solid var(--primary);background:#f0fafa">
-      <div style="font-size:13px;color:var(--secondary)">
-        <strong>Demo Credentials</strong><br>
-        <span style="color:var(--muted)">Login credentials shown for demo purposes only.</span>
-        <div style="margin-top:8px;display:flex;gap:24px;flex-wrap:wrap">
-          <div>
-            <span style="color:var(--muted)">Email: </span>
-            <code id="demo-email" style="background:#e0f2f2;padding:2px 8px;
-              border-radius:4px;font-size:13px">-</code>
-          </div>
-          <div>
-            <span style="color:var(--muted)">Password: </span>
-            <code style="background:#e0f2f2;padding:2px 8px;
-              border-radius:4px;font-size:13px">password123</code>
-          </div>
+    <section class="card profile-demo-card">
+      <div class="section-title">Demo Credentials</div>
+      <div class="micro-copy">Login credentials are shown here for demo purposes only.</div>
+      <div class="profile-demo-grid">
+        <div>
+          <span class="profile-detail-label">Email</span><br>
+          <code id="demo-email">-</code>
+        </div>
+        <div>
+          <span class="profile-detail-label">Password</span><br>
+          <code>password123</code>
         </div>
       </div>
-    </div>
-
+    </section>
   </main>
 </div>
+
+<div class="modal-overlay" id="avatar-modal" aria-hidden="true">
+  <div class="modal avatar-modal" role="dialog" aria-modal="true" aria-labelledby="avatar-modal-title">
+    <div class="avatar-modal-copy">
+      <h3 id="avatar-modal-title">Choose your avatar</h3>
+      <p>Select one of your SVG avatars or upload a personal photo. The choice will be saved to the database and reused across your student pages.</p>
+      <span class="meta-pill" id="avatar-modal-status"><strong>Avatar</strong> Using initials</span>
+    </div>
+    <div class="avatar-gallery" id="avatar-gallery"></div>
+    <div class="modal-footer">
+      <div class="avatar-modal-actions">
+        <label class="btn btn-secondary" for="avatar-file-input">Upload photo</label>
+        <button class="btn btn-outline" id="avatar-reset-btn" type="button">Use initials</button>
+      </div>
+      <button class="btn btn-outline" id="avatar-close-btn" type="button">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
-<script src="../mockData.js"></script>
+
+<script src="../api.js?v=20260316b"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
-  const s      = getCurrentStudent();
-  const prog   = MOCK.weeklyProgress[s.id];
-  const scores = prog.map(function(w){ return w.score; });
-  const latest = prog[prog.length - 1];
+  const DEFAULT_AVATARS = [
+    "/readwise/avatar/avatar-boy-svgrepo-com.svg",
+    "/readwise/avatar/avatar-boy-svgrepo-com (1).svg",
+    "/readwise/avatar/avatar-boy-svgrepo-com (2).svg",
+    "/readwise/avatar/avatar-boy-svgrepo-com (3).svg",
+    "/readwise/avatar/avatar-boy-svgrepo-com (4).svg",
+    "/readwise/avatar/avatar-boy-svgrepo-com (5).svg",
+    "/readwise/avatar/avatar-boy-svgrepo-com (6).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com.svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (1).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (2).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (3).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (4).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (5).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (6).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (7).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (8).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (9).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (10).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (11).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (12).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (13).svg",
+    "/readwise/avatar/avatar-girl-svgrepo-com (14).svg"
+  ];
 
-  // Initials
-  const initials = s.name.split(" ").map(function(n){ return n[0]; }).join("").substring(0,2);
-  document.getElementById("avatar-initials").textContent = initials;
-  document.getElementById("sb-name").textContent         = s.name;
-  document.getElementById("full-name").textContent       = s.name;
-  document.getElementById("info-name").textContent       = s.name;
-  document.getElementById("info-grade").textContent      = "Grade " + s.grade + " | " + s.section;
+  const DEMO_EMAILS = {
+    s1: "juan.delacruz@pnhs.edu",
+    s2: "maria.santos@pnhs.edu",
+    s3: "carlo.reyes@pnhs.edu"
+  };
 
-  // Level pill
-  document.getElementById("level-pill").innerHTML =
-    '<span class="badge ' + badgeClass(s.classLevel) + '" style="font-size:13px;padding:4px 14px">' +
-    s.classLevel + ' Level</span>';
+  let activeStudent = null;
+  let currentAvatarType = "initials";
+  let currentAvatarValue = "";
 
-  // Stats
-  const best = Math.max.apply(null, scores);
-  document.getElementById("stat-pre").textContent    = s.preScore + "%";
-  document.getElementById("bar-pre").style.width     = s.preScore + "%";
-  document.getElementById("stat-latest").textContent = latest.score + "%";
-  document.getElementById("bar-latest").style.width  = latest.score + "%";
-  document.getElementById("bar-latest").style.background =
-    latest.score >= 65 ? "var(--easy)" : latest.score >= 50 ? "var(--accent)" : "var(--hard)";
-  document.getElementById("stat-best").textContent   = best + "%";
-  document.getElementById("bar-best").style.width    = best + "%";
-  document.getElementById("rec-display").textContent = latest.recommendation;
-
-  // Level history
-  const histWrap = document.getElementById("level-history");
-  prog.forEach(function(w) {
-    const row = document.createElement("div");
-    row.style.cssText = "display:flex;justify-content:space-between;align-items:center;" +
-      "padding:8px 10px;background:#f7fafc;border-radius:8px;font-size:13px";
-    row.innerHTML =
-      '<span style="color:var(--muted)">Week ' + w.week + '</span>' +
-      '<span class="badge ' + badgeClass(w.difficulty) + '">' + w.difficulty + '</span>' +
-      '<strong>' + w.score + '%</strong>';
-    histWrap.appendChild(row);
-  });
-
-  // Demo email
-  var emails = { s1:"juan.delacruz@pnhs.edu", s2:"maria.santos@pnhs.edu", s3:"carlo.reyes@pnhs.edu" };
-  document.getElementById("demo-email").textContent = emails[s.id] || "student@example.com";
-
-  // Profile photo upload, display, and local persistence
-  var photoKey  = "profilePhoto_" + s.id;
-  var imgEl     = document.getElementById("avatar-img");
-  var initEl    = document.getElementById("avatar-initials");
-  var removeBtn = document.getElementById("remove-photo-btn");
-  var fileInput = document.getElementById("avatar-file-input");
-
-  // Load saved photo on page load
-  var saved = localStorage.getItem(photoKey);
-  if (saved) {
-    showPhoto(saved);
-  }
-
-  // When user picks a file
-  fileInput.addEventListener("change", function() {
-    var file = fileInput.files[0];
-    if (!file) return;
-
-    // Validate: image only, max 5MB
-    if (!file.type.startsWith("image/")) {
-      showToast("Please select an image file.", "#c0392b");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      showToast("Image must be under 5MB.", "#c0392b");
-      return;
+  async function logout() {
+    try {
+      if (window.ReadWiseAPI && typeof ReadWiseAPI.logout === "function") {
+        await ReadWiseAPI.logout();
+      }
+    } catch (error) {
+      console.warn("Logout request failed:", error);
     }
 
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var dataUrl = e.target.result;
-      localStorage.setItem(photoKey, dataUrl);
-      showPhoto(dataUrl);
-      showToast("Profile photo updated.");
-    };
-    reader.readAsDataURL(file);
-  });
-
-  function showPhoto(src) {
-    imgEl.src            = src;
-    imgEl.style.display  = "block";
-    initEl.style.display = "none";
-    removeBtn.style.display = "block";
+    sessionStorage.clear();
+    window.location.href = "../login.html";
   }
 
-  function removePhoto() {
-    localStorage.removeItem(photoKey);
-    imgEl.src            = "";
-    imgEl.style.display  = "none";
-    initEl.style.display = "flex";
-    removeBtn.style.display = "none";
-    fileInput.value      = "";
-    showToast("Profile photo removed.");
+  async function loadProfileStudent() {
+    if (window.ReadWiseAPI && typeof ReadWiseAPI.me === "function") {
+      try {
+        const auth = await ReadWiseAPI.me();
+        if (auth && auth.user && auth.user.role === "student" && auth.user.student) {
+          return auth.user.student;
+        }
+      } catch (error) {
+        console.warn("Falling back to cached student profile data:", error);
+      }
+    }
+
+    if (window.ReadWiseAPI && typeof ReadWiseAPI.getCachedUser === "function") {
+      const cached = ReadWiseAPI.getCachedUser();
+      if (cached && cached.student) {
+        return cached.student;
+      }
+    }
+
+    return Object.assign({ avatarType: "initials", avatarValue: "" }, getCurrentStudent());
   }
+
+  function getAvatarLabel(index) {
+    return "Avatar option " + (index + 1);
+  }
+
+  function getAvatarStateLabel() {
+    if (currentAvatarType === "upload" && currentAvatarValue) return "Using uploaded photo";
+    if (currentAvatarType === "preset" && currentAvatarValue) return "Using built-in SVG avatar";
+    return "Using initials";
+  }
+
+  function currentAvatarImage() {
+    if ((currentAvatarType === "upload" || currentAvatarType === "preset") && currentAvatarValue) {
+      return currentAvatarValue;
+    }
+    return "";
+  }
+
+  function closeAvatarModal() {
+    const modal = document.getElementById("avatar-modal");
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function openAvatarModal() {
+    const modal = document.getElementById("avatar-modal");
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function syncAvatarUI() {
+    const initialsEl = document.getElementById("avatar-initials");
+    const imageEl = document.getElementById("avatar-img");
+    const statusEl = document.getElementById("avatar-status");
+    const modalStatusEl = document.getElementById("avatar-modal-status");
+    const galleryButtons = Array.from(document.querySelectorAll(".avatar-option"));
+    const avatarSrc = currentAvatarImage();
+
+    if (avatarSrc) {
+      imageEl.src = avatarSrc;
+      imageEl.style.display = "block";
+      initialsEl.style.display = "none";
+    } else {
+      imageEl.src = "";
+      imageEl.style.display = "none";
+      initialsEl.style.display = "flex";
+    }
+
+    statusEl.textContent = getAvatarStateLabel();
+    modalStatusEl.innerHTML = "<strong>Avatar</strong> " + getAvatarStateLabel();
+
+    galleryButtons.forEach(function(button) {
+      const isActive = currentAvatarType === "preset" && button.dataset.avatarSrc === currentAvatarValue;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  }
+
+  async function persistAvatarSelection(avatarType, avatarValue, successMessage) {
+    if (!window.ReadWiseAPI || typeof ReadWiseAPI.updateStudentAvatar !== "function") {
+      showToast("Start the Flask API to save avatar changes.", "#c0392b");
+      return;
+    }
+
+    try {
+      const result = await ReadWiseAPI.updateStudentAvatar({
+        avatarType: avatarType,
+        avatarValue: avatarValue
+      });
+      if (!result || !result.user || !result.user.student) {
+        throw new Error("Unable to save avatar.");
+      }
+
+      activeStudent = result.user.student;
+      currentAvatarType = activeStudent.avatarType || "initials";
+      currentAvatarValue = activeStudent.avatarValue || "";
+      syncAvatarUI();
+      closeAvatarModal();
+      showToast(successMessage);
+    } catch (error) {
+      showToast(error.message || "Unable to save avatar.", "#c0392b");
+    }
+  }
+
+  function renderAvatarGallery() {
+    const gallery = document.getElementById("avatar-gallery");
+    gallery.innerHTML = DEFAULT_AVATARS.map(function(src, index) {
+      return (
+        '<button class="avatar-option" type="button" data-avatar-src="' + src + '" aria-label="' + getAvatarLabel(index) + '" aria-pressed="false">' +
+          '<img src="' + src + '" alt="' + getAvatarLabel(index) + '">' +
+        "</button>"
+      );
+    }).join("");
+
+    Array.from(gallery.querySelectorAll(".avatar-option")).forEach(function(button) {
+      button.addEventListener("click", function() {
+        persistAvatarSelection("preset", button.dataset.avatarSrc, "Built-in avatar selected.");
+      });
+    });
+  }
+
+  async function bootstrapProfile() {
+    activeStudent = await loadProfileStudent();
+    currentAvatarType = activeStudent.avatarType || "initials";
+    currentAvatarValue = activeStudent.avatarValue || "";
+
+    const progress = MOCK.weeklyProgress[activeStudent.id] || [];
+    const scores = progress.map(function(entry) { return entry.score; });
+    const latest = progress.length ? progress[progress.length - 1] : null;
+    const best = scores.length ? Math.max.apply(null, scores) : activeStudent.preScore;
+    const initials = activeStudent.name.split(" ").map(function(part) { return part[0]; }).join("").slice(0, 2).toUpperCase();
+
+    document.getElementById("avatar-initials").textContent = initials;
+    document.getElementById("sb-name").textContent = activeStudent.name;
+    document.getElementById("sb-meta").textContent = "Grade " + activeStudent.grade + " | " + activeStudent.section;
+    document.getElementById("full-name").textContent = activeStudent.name;
+    document.getElementById("profile-summary").textContent = "Grade " + activeStudent.grade + " student from " + activeStudent.section;
+    document.getElementById("info-name").textContent = activeStudent.name;
+    document.getElementById("info-grade").textContent = "Grade " + activeStudent.grade + " | " + activeStudent.section;
+    document.getElementById("demo-email").textContent = DEMO_EMAILS[activeStudent.id] || "student@example.com";
+    document.getElementById("program-week").textContent =
+      "Week " + (latest ? latest.week : 1) + " of " + TOTAL_PROGRAM_WEEKS;
+
+    document.getElementById("level-pill").innerHTML =
+      '<span class="badge ' + badgeClass(activeStudent.classLevel) + '" style="font-size:13px;padding:4px 14px">' +
+        getClassDisplayName(activeStudent.classLevel) + " Level" +
+      "</span>";
+    document.getElementById("level-pill-label").textContent = getClassDisplayName(activeStudent.classLevel);
+
+    document.getElementById("stat-pre").textContent = activeStudent.preScore + "%";
+    document.getElementById("bar-pre").style.width = activeStudent.preScore + "%";
+    document.getElementById("stat-latest").textContent = latest ? latest.score + "%" : "-%";
+    document.getElementById("bar-latest").style.width = latest ? latest.score + "%" : "0%";
+    document.getElementById("bar-latest").style.background =
+      latest && latest.score >= 65 ? "var(--easy)" :
+      latest && latest.score >= 50 ? "var(--accent)" :
+      "var(--hard)";
+    document.getElementById("stat-best").textContent = best + "%";
+    document.getElementById("bar-best").style.width = best + "%";
+    document.getElementById("rec-display").textContent = latest ? latest.recommendation : getClassDisplayName(activeStudent.classLevel);
+    document.getElementById("rec-note").textContent = latest
+      ? "Based on your last " + Math.min(progress.length, 2) + " tracked session(s)."
+      : "No completed sessions yet, so your current class level is being used.";
+
+    const historyWrap = document.getElementById("level-history");
+    if (!progress.length) {
+      historyWrap.innerHTML =
+        '<div class="surface-note surface-note-warn">No completed reading sessions yet. Start a passage to build your progress history.</div>';
+    } else {
+      historyWrap.innerHTML = progress.map(function(entry) {
+        return (
+          '<div class="profile-history-item">' +
+            '<div>' +
+              '<div class="profile-history-week">Week ' + entry.week + "</div>" +
+              '<div class="micro-copy">Recommendation: ' + entry.recommendation + "</div>" +
+            "</div>" +
+            '<div class="profile-history-meta">' +
+              '<span class="badge ' + badgeClass(entry.difficulty) + '">' + entry.difficulty + "</span>" +
+              '<span class="profile-history-score">' + entry.score + "%</span>" +
+            "</div>" +
+          "</div>"
+        );
+      }).join("");
+    }
+
+    renderAvatarGallery();
+    syncAvatarUI();
+
+    document.getElementById("avatar-picker-btn").addEventListener("click", openAvatarModal);
+    document.getElementById("avatar-close-btn").addEventListener("click", closeAvatarModal);
+    document.getElementById("avatar-reset-btn").addEventListener("click", function() {
+      persistAvatarSelection("initials", "", "Avatar reset to initials.");
+    });
+
+    const modal = document.getElementById("avatar-modal");
+    modal.addEventListener("click", function(event) {
+      if (event.target === modal) closeAvatarModal();
+    });
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Escape" && modal.classList.contains("active")) {
+        closeAvatarModal();
+      }
+    });
+
+    document.getElementById("avatar-file-input").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        showToast("Please select an image file.", "#c0392b");
+        event.target.value = "";
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("Image must be under 5MB.", "#c0392b");
+        event.target.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(loadEvent) {
+        persistAvatarSelection("upload", loadEvent.target.result, "Profile photo updated.");
+      };
+      reader.readAsDataURL(file);
+      event.target.value = "";
+    });
+  }
+
+  bootstrapProfile();
 </script>
 </body>
 </html>

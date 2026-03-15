@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teacher Dashboard - ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="teacher-dashboard-page">
@@ -17,45 +17,57 @@
       <p>Teacher Portal</p>
     </div>
     <nav>
-      <a href="teacher-dashboard.html" class="active"><span class="icon"></span> Dashboard</a>
-      <a href="teacher-passages.html"><span class="icon"></span> Passage Library</a>
-      <a href="teacher-submit.html"><span class="icon"></span> Submit Passage</a>
-      <a href="teacher-students.html"><span class="icon"></span> Students</a>
-      <a href="teacher-recommendations.html"><span class="icon"></span> Recommendations</a>
-      <a href="teacher-reports.html"><span class="icon"></span> Reports</a>
+      <a href="teacher-dashboard.html" class="active"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="teacher-passages.html"><span class="icon" data-icon="library"></span><span class="nav-label">Passage Library</span></a>
+      <a href="teacher-submit.html"><span class="icon" data-icon="submit"></span><span class="nav-label">Submit Passage</span></a>
+      <a href="teacher-students.html"><span class="icon" data-icon="students"></span><span class="nav-label">Students</span></a>
+      <a href="teacher-recommendations.html"><span class="icon" data-icon="recommendations"></span><span class="nav-label">Recommendations</span></a>
+      <a href="teacher-reports.html"><span class="icon" data-icon="reports"></span><span class="nav-label">Reports</span></a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info"><strong>Ms. Ana Villanueva</strong>Grade 7 English | PNHS</div>
-      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'">Logout</button>
+      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
-    <div class="page-header">
-      <h1>Teacher Dashboard</h1>
-      <p>Pulo National High School | Grade 7 English | Week 5 of 8</p>
+    <div class="page-header page-header-split">
+      <div class="page-header-copy">
+        <p class="eyebrow">Teacher workspace</p>
+        <h1>Teacher Dashboard</h1>
+        <p>Track recent submissions, weekly priorities, and class balance from one calm control center.</p>
+      </div>
+      <div class="header-meta">
+        <span class="meta-pill"><strong>Week 5</strong> of 8</span>
+        <span class="meta-pill"><strong>Grade 7 English</strong> PNHS</span>
+      </div>
     </div>
 
     <div class="card-grid card-grid-3 dashboard-summary-grid" style="margin-bottom:16px">
-      <div class="stat-card" style="border-top:4px solid var(--easy)">
+      <div class="stat-card stat-card-level stat-card-easy">
         <div class="stat-label">Easy Class</div>
-        <div class="stat-val" style="color:var(--easy)">1</div>
-        <div style="font-size:13px;color:var(--muted)">Carlo Reyes</div>
+        <div class="stat-val">1</div>
+        <div class="kpi-support">Carlo Reyes</div>
       </div>
-      <div class="stat-card" style="border-top:4px solid var(--moderate)">
+      <div class="stat-card stat-card-level stat-card-moderate">
         <div class="stat-label">Moderate Class</div>
-        <div class="stat-val" style="color:var(--moderate)">1</div>
-        <div style="font-size:13px;color:var(--muted)">Maria Santos</div>
+        <div class="stat-val">1</div>
+        <div class="kpi-support">Maria Santos</div>
       </div>
-      <div class="stat-card" style="border-top:4px solid var(--hard)">
+      <div class="stat-card stat-card-level stat-card-hard">
         <div class="stat-label">Difficult Class</div>
-        <div class="stat-val" style="color:var(--hard)">1</div>
-        <div style="font-size:13px;color:var(--muted)">Juan Dela Cruz</div>
+        <div class="stat-val">1</div>
+        <div class="kpi-support">Juan Dela Cruz</div>
       </div>
     </div>
 
     <div class="card-grid card-grid-2 dashboard-insights-grid" style="margin-bottom:16px">
       <div class="card dashboard-table-card">
-        <div class="section-title">Recent Submissions</div>
+        <div class="card-header">
+          <div class="card-header-copy">
+            <div class="section-title">Recent Submissions</div>
+            <div class="micro-copy">Latest quiz and short-answer work needing attention.</div>
+          </div>
+        </div>
         <div class="table-wrap">
           <table class="dashboard-mobile-table">
             <thead><tr><th>Student</th><th>Passage</th><th>Score</th><th>Status</th></tr></thead>
@@ -83,13 +95,23 @@
         </div>
       </div>
       <div class="card dashboard-chart-card">
-        <div class="section-title">Class Score Distribution</div>
+        <div class="card-header">
+          <div class="card-header-copy">
+            <div class="section-title">Class Score Distribution</div>
+            <div class="micro-copy">Current spread across the three reading levels.</div>
+          </div>
+        </div>
         <div class="chart-wrap"><canvas id="classChart"></canvas></div>
       </div>
     </div>
 
     <div class="card" style="margin-bottom:16px">
-      <div class="section-title">Quick Actions</div>
+      <div class="card-header">
+        <div class="card-header-copy">
+          <div class="section-title">Quick Actions</div>
+          <div class="micro-copy">Jump into the tasks that keep the week moving.</div>
+        </div>
+      </div>
       <div class="dashboard-actions">
         <a href="teacher-passages.html" class="btn btn-primary">View Passage Library</a>
         <a href="teacher-submit.html" class="btn btn-secondary">Submit New Passage</a>
@@ -99,7 +121,12 @@
     </div>
 
     <div class="card">
-      <div class="section-title">Pending Actions</div>
+      <div class="card-header">
+        <div class="card-header-copy">
+          <div class="section-title">Pending Actions</div>
+          <div class="micro-copy">High-priority items waiting for review or scoring.</div>
+        </div>
+      </div>
       <div class="dashboard-alerts">
         <div class="dashboard-alert dashboard-alert-danger">
           <div>
@@ -119,7 +146,7 @@
     </div>
   </main>
 </div>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   function chartSurfaceBorder() {
     return getComputedStyle(document.documentElement).getPropertyValue("--surface-strong").trim() || "rgba(255,255,255,0.92)";
@@ -167,3 +194,5 @@
 </script>
 </body>
 </html>
+
+

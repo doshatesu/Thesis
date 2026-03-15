@@ -127,6 +127,7 @@ const ASSIGNMENTS_STORAGE_KEY = "readwise_weekly_assignments_v1";
 const ASSIGNMENTS_ACTIVE_WEEK_KEY = "readwise_active_week_v1";
 const COMPLETION_STORAGE_KEY = "readwise_weekly_completion_v1";
 const THEME_PREFERENCE_KEY = "readwise_theme_preference_v1";
+const USER_CACHE_KEY = "readwise_user_v1";
 const MAX_WEEKLY_PASSAGES_PER_CLASS = 5;
 const TOTAL_PROGRAM_WEEKS = 8;
 const CLASS_LEVELS = ["EASY", "MODERATE", "HARD"];
@@ -630,6 +631,124 @@ function getStudent(id)       { return MOCK.students.find(s=>s.id===id); }
 function getPassage(id)       { return MOCK.passages.find(p=>p.id===id); }
 function getPassages()        { return cloneData(MOCK.passages); }
 function getCurrentStudent()  { return getStudent(sessionStorage.getItem("studentId")||"s1"); }
+function getCachedReadWiseUser() {
+  try {
+    const raw = localStorage.getItem(USER_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+}
+function getUserInitials(name, email) {
+  const source = String(name || email || "?").trim();
+  if (!source) return "?";
+  const parts = source.split(/\s+/).filter(Boolean);
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return source.slice(0, 2).toUpperCase();
+}
+function getShellAvatarData(user) {
+  const student = user && user.student ? user.student : null;
+  if (!student) return null;
+  const type = String(student.avatarType || "initials").trim().toLowerCase();
+  const value = String(student.avatarValue || "").trim();
+  if ((type === "preset" || type === "upload") && value) {
+    return { type: type, value: value };
+  }
+  return null;
+}
+function ensureShellUserInfoLayout(userInfo) {
+  if (!userInfo) return null;
+
+  let avatar = userInfo.querySelector(".shell-user-avatar");
+  let copy = userInfo.querySelector(".shell-user-copy");
+
+  if (!avatar || !copy) {
+    const existingName = userInfo.querySelector("strong");
+    const existingMeta = userInfo.querySelector("#sb-meta");
+    const nameId = existingName && existingName.id ? existingName.id : "";
+    const metaId = existingMeta && existingMeta.id ? existingMeta.id : "";
+    const nameText = existingName ? existingName.textContent.trim() : "";
+    const metaParts = [];
+
+    Array.from(userInfo.childNodes).forEach(function(node) {
+      if (existingName && node === existingName) return;
+      const text = String(node.textContent || "").trim();
+      if (text) metaParts.push(text);
+    });
+
+    userInfo.innerHTML = "";
+    userInfo.classList.add("shell-user-info");
+
+    avatar = document.createElement("div");
+    avatar.className = "shell-user-avatar";
+    avatar.setAttribute("aria-hidden", "true");
+
+    copy = document.createElement("div");
+    copy.className = "shell-user-copy";
+
+    const name = document.createElement("strong");
+    if (nameId) name.id = nameId;
+    name.textContent = nameText || "-";
+
+    const meta = document.createElement("span");
+    meta.className = "shell-user-meta";
+    if (metaId) meta.id = metaId;
+    meta.textContent = metaParts.join(" ").trim();
+
+    copy.appendChild(name);
+    copy.appendChild(meta);
+    userInfo.appendChild(avatar);
+    userInfo.appendChild(copy);
+  }
+
+  return {
+    root: userInfo,
+    avatar: avatar,
+    copy: copy,
+    name: copy.querySelector("strong"),
+    meta: copy.querySelector(".shell-user-meta") || copy.querySelector("#sb-meta")
+  };
+}
+function renderShellUserAvatar(container, user, fallbackName, fallbackEmail) {
+  if (!container) return;
+
+  const avatar = getShellAvatarData(user);
+  if (avatar) {
+    container.innerHTML = '<img src="' + avatar.value + '" alt="">';
+    container.classList.add("has-image");
+    return;
+  }
+
+  container.textContent = getUserInitials(fallbackName, fallbackEmail);
+  container.classList.remove("has-image");
+}
+function syncShellUserFooter(sidebar, currentPageName) {
+  const userInfo = sidebar ? sidebar.querySelector(".sidebar-footer .user-info") : null;
+  if (!userInfo) return;
+
+  const layout = ensureShellUserInfoLayout(userInfo);
+  if (!layout || !layout.name) return;
+
+  const cachedUser = getCachedReadWiseUser();
+  const isStudentPage = /^student-/.test(String(currentPageName || ""));
+  if (cachedUser && cachedUser.student && isStudentPage) {
+    layout.name.textContent = cachedUser.student.name || layout.name.textContent;
+    if (layout.meta) {
+      layout.meta.textContent = "Grade " + cachedUser.student.grade + " | " + cachedUser.student.section;
+    }
+  }
+
+  renderShellUserAvatar(
+    layout.avatar,
+    cachedUser && cachedUser.student && isStudentPage ? cachedUser : null,
+    layout.name.textContent,
+    cachedUser ? cachedUser.email : ""
+  );
+}
 function themeColor(name, fallback) {
   if (typeof window === "undefined" || !window.getComputedStyle || !document.documentElement) {
     return fallback;
@@ -826,6 +945,24 @@ function getShellPageName(href) {
   return value.slice(value.lastIndexOf("/") + 1);
 }
 
+function getShellLogoTarget(pageName) {
+  if (/^student-/.test(pageName)) {
+    return {
+      href: "student-profile.html",
+      label: "Open my profile"
+    };
+  }
+
+  if (/^teacher-/.test(pageName)) {
+    return {
+      href: "teacher-dashboard.html",
+      label: "Open teacher dashboard"
+    };
+  }
+
+  return null;
+}
+
 function getShellIcon(name) {
   const paths = SHELL_ICON_PATHS[name] || SHELL_ICON_PATHS.home;
   return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + paths + "</svg>";
@@ -948,6 +1085,26 @@ function initReadWiseShell() {
 
   if (!sidebar.id) sidebar.id = "app-sidebar";
 
+  const currentPageName = getShellPageName(window.location.pathname);
+  const logoTarget = getShellLogoTarget(currentPageName);
+  let logo = sidebar.querySelector(".sidebar-logo");
+  if (logo && logoTarget) {
+    if (logo.tagName !== "A") {
+      const anchor = document.createElement("a");
+      anchor.className = logo.className;
+      while (logo.firstChild) anchor.appendChild(logo.firstChild);
+      logo.replaceWith(anchor);
+      logo = anchor;
+    }
+
+    logo.classList.add("sidebar-logo-link");
+    logo.setAttribute("href", logoTarget.href);
+    logo.setAttribute("title", logoTarget.label);
+    logo.setAttribute("aria-label", logoTarget.label);
+  }
+
+  syncShellUserFooter(sidebar, currentPageName);
+
   const navLinks = Array.from(sidebar.querySelectorAll("nav a"));
   navLinks.forEach(function(link) {
     const pageName = getShellPageName(link.getAttribute("href"));
@@ -1011,6 +1168,9 @@ function initReadWiseShell() {
   });
 
   window.addEventListener("readwise:themechange", syncThemeButtons);
+  window.addEventListener("readwise:usercachechange", function() {
+    syncShellUserFooter(sidebar, currentPageName);
+  });
   syncThemeButtons();
 
   let overlay = document.querySelector(".sidebar-overlay");
@@ -1086,6 +1246,10 @@ function initReadWiseShell() {
   navLinks.forEach(function(link) {
     link.addEventListener("click", closeMobileSidebar);
   });
+
+  if (logo && logoTarget) {
+    logo.addEventListener("click", closeMobileSidebar);
+  }
 
   document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") closeMobileSidebar();

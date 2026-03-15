@@ -3,17 +3,33 @@ let role = "student";
 const studentBtn = document.getElementById("studentBtn");
 const teacherBtn = document.getElementById("teacherBtn");
 const loginBtn = document.getElementById("loginBtn");
+const loginError = document.getElementById("loginError");
+const passwordInput = document.getElementById("password");
+const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+
+function syncRoleButtons() {
+  const isStudent = role === "student";
+  studentBtn.classList.toggle("active", isStudent);
+  teacherBtn.classList.toggle("active", !isStudent);
+  studentBtn.setAttribute("aria-selected", isStudent ? "true" : "false");
+  teacherBtn.setAttribute("aria-selected", isStudent ? "false" : "true");
+}
 
 studentBtn.addEventListener("click", () => {
   role = "student";
-  studentBtn.classList.add("active");
-  teacherBtn.classList.remove("active");
+  syncRoleButtons();
 });
 
 teacherBtn.addEventListener("click", () => {
   role = "teacher";
-  teacherBtn.classList.add("active");
-  studentBtn.classList.remove("active");
+  syncRoleButtons();
+});
+
+togglePasswordBtn.addEventListener("click", () => {
+  const reveal = passwordInput.type === "password";
+  passwordInput.type = reveal ? "text" : "password";
+  togglePasswordBtn.textContent = reveal ? "Hide" : "Show";
+  togglePasswordBtn.setAttribute("aria-label", reveal ? "Hide password" : "Show password");
 });
 
 loginBtn.addEventListener("click", async () => {
@@ -26,8 +42,9 @@ loginBtn.addEventListener("click", async () => {
   }
 
   loginBtn.disabled = true;
-  loginBtn.style.opacity = "0.7";
+  loginBtn.classList.add("is-loading");
   loginBtn.textContent = "Signing in...";
+  loginError.hidden = true;
 
   try {
     const result = await ReadWiseAPI.login(email, password, role);
@@ -50,18 +67,22 @@ loginBtn.addEventListener("click", async () => {
     showError(error.message || "Invalid credentials. Try again.");
   } finally {
     loginBtn.disabled = false;
-    loginBtn.style.opacity = "1";
-    loginBtn.textContent = "Login";
+    loginBtn.classList.remove("is-loading");
+    loginBtn.textContent = "Sign In";
   }
 });
 
 function showError(message) {
-  let error = document.getElementById("loginError");
-  if (!error) {
-    error = document.createElement("p");
-    error.id = "loginError";
-    error.className = "login-error";
-    document.querySelector(".card").appendChild(error);
-  }
-  error.textContent = message || "Invalid credentials. Try again.";
+  loginError.textContent = message || "Invalid credentials. Try again.";
+  loginError.hidden = false;
 }
+
+document.getElementById("email").addEventListener("input", () => {
+  loginError.hidden = true;
+});
+
+passwordInput.addEventListener("input", () => {
+  loginError.hidden = true;
+});
+
+syncRoleButtons();

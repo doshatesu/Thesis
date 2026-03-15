@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pre-Assessment â€” ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
+  <title>Pre-Assessment - ReadWise</title>
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
 </head>
 <body>
 <div class="demo-banner">ReadWise System | Pulo National High School</div>
@@ -14,21 +14,21 @@
       <div class="logo-mark">RW</div><h2>ReadWise</h2><p>Student Portal</p>
     </div>
     <nav>
-      <a href="student-profile.html"><span class="icon">ðŸ‘¤</span> My Profile</a>
-      <a href="student-dashboard.html"><span class="icon">ðŸ </span> Dashboard</a>
-      <a href="student-passage.html"><span class="icon">ðŸ“–</span> My Passage</a>
-      <a href="student-progress.html"><span class="icon">ðŸ“Š</span> My Progress</a>
-      <a href="student-pre-assessment.html" class="active"><span class="icon">ðŸ“</span> Pre-Assessment</a>
+      <a href="student-profile.html"><span class="icon" data-icon="profile"></span><span class="nav-label">My Profile</span></a>
+      <a href="student-dashboard.html"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="student-passage.html"><span class="icon" data-icon="passage"></span><span class="nav-label">My Passage</span></a>
+      <a href="student-progress.html"><span class="icon" data-icon="progress"></span><span class="nav-label">My Progress</span></a>
+      <a href="student-pre-assessment.html" class="active"><span class="icon" data-icon="assessment"></span><span class="nav-label">Pre-Assessment</span></a>
     </nav>
     <div class="sidebar-footer">
-      <div class="user-info"><strong id="sb-name">â€”</strong>Grade 7</div>
-      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'">â¬… Logout</button>
+      <div class="user-info"><strong id="sb-name">-</strong>Grade 7</div>
+      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
     <div style="max-width:700px;margin:0 auto">
       <div class="page-header">
-        <h1>ðŸ“ Pre-Assessment Test</h1>
+        <h1>Pre-Assessment Test</h1>
         <p>Read 3 passages (Easy, Moderate, Hard) and answer the questions to determine your initial reading level.</p>
       </div>
       <div id="step-indicator" style="display:flex;align-items:center;gap:8px;margin-bottom:20px"></div>
@@ -37,7 +37,7 @@
   </main>
 </div>
 <div class="toast" id="toast"></div>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   const s = getCurrentStudent();
   document.getElementById("sb-name").textContent = s.name;
@@ -66,7 +66,7 @@
     const pid = pids[step];
     const p = getPassage(pid);
     const qs = MOCK.questions[pid];
-    const stepLabels = ["Step 1 â€” Easy Passage", "Step 2 â€” Moderate Passage", "Step 3 â€” Hard Passage"];
+    const stepLabels = ["Step 1 - Easy Passage", "Step 2 - Moderate Passage", "Step 3 - Hard Passage"];
 
     const body = document.getElementById("assessment-body");
     body.innerHTML = "";
@@ -144,7 +144,7 @@
     btnWrap.style.cssText = "text-align:right;margin-top:14px";
     const btn = document.createElement("button");
     btn.className = "btn btn-primary";
-    btn.textContent = step < pids.length - 1 ? "Next Passage â†’" : "Submit Assessment âœ…";
+    btn.textContent = step < pids.length - 1 ? "Next Passage" : "Submit Assessment";
     btn.onclick = nextStep;
     btnWrap.appendChild(btn);
     qCard.appendChild(btnWrap);
@@ -189,8 +189,8 @@
         'Based on your pre-assessment results, ReadWise recommends placing you in the <strong>' + level + '</strong> reading class. Your teacher will confirm this assignment.' +
       '</p>' +
       '<div style="display:flex;gap:10px;justify-content:center">' +
-        '<a href="student-dashboard.html" class="btn btn-primary">ðŸ  Go to Dashboard</a>' +
-        '<a href="student-progress.html" class="btn btn-outline">ðŸ“Š View Progress</a>' +
+        '<a href="student-dashboard.html" class="btn btn-primary">Go to Dashboard</a>' +
+        '<a href="student-progress.html" class="btn btn-outline">View Progress</a>' +
       '</div>';
 
     body.appendChild(card);
@@ -200,7 +200,7 @@
     const done = document.createElement("span");
     done.className = "badge badge-success";
     done.style.cssText = "font-size:14px;padding:6px 16px";
-    done.textContent = "âœ… Pre-Assessment Complete";
+    done.textContent = "Pre-Assessment Complete";
     ind.appendChild(done);
   }
 
@@ -208,4 +208,6 @@
 </script>
 </body>
 </html>
+
+
 

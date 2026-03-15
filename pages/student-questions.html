@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Questions - ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
 </head>
 <body>
 <div class="demo-banner">ReadWise System | Pulo National High School</div>
@@ -16,59 +16,66 @@
       <p>Student Portal</p>
     </div>
     <nav>
-      <a href="student-profile.html"><span class="icon">&#128100;</span> My Profile</a>
-      <a href="student-dashboard.html"><span class="icon">&#8962;</span> Dashboard</a>
-      <a href="student-passage.html" class="active"><span class="icon">&#128214;</span> My Passage</a>
-      <a href="student-progress.html"><span class="icon">&#128202;</span> My Progress</a>
-      <a href="student-pre-assessment.html"><span class="icon">&#128221;</span> Pre-Assessment</a>
+      <a href="student-profile.html"><span class="icon" data-icon="profile"></span><span class="nav-label">My Profile</span></a>
+      <a href="student-dashboard.html"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="student-passage.html" class="active"><span class="icon" data-icon="passage"></span><span class="nav-label">My Passage</span></a>
+      <a href="student-progress.html"><span class="icon" data-icon="progress"></span><span class="nav-label">My Progress</span></a>
+      <a href="student-pre-assessment.html"><span class="icon" data-icon="assessment"></span><span class="nav-label">Pre-Assessment</span></a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info"><strong id="sb-name">-</strong>Grade 7</div>
-      <button class="logout-btn" onclick="logout()">&larr; Logout</button>
+      <button class="logout-btn" onclick="logout()"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
-    <div style="max-width:700px;margin:0 auto">
-      <button class="back-btn" onclick="history.back()">&larr; Back to Passage</button>
+    <div class="assessment-shell">
+      <button class="back-btn" onclick="history.back()"><span class="icon" data-icon="back"></span>Back to Passage</button>
       <div class="page-header">
+        <p class="eyebrow">Comprehension check</p>
         <h1 id="q-title">Comprehension Questions</h1>
         <p id="q-sub"></p>
       </div>
       <div id="questions-wrap"></div>
 
       <div class="card" style="margin-top:16px">
-        <div class="section-title">Difficulty Rating</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">
+        <div class="card-header">
+          <div class="card-header-copy">
+            <div class="section-title">Difficulty Rating</div>
+            <p class="micro-copy">
           How difficult did you find this passage? (1 = Very Easy, 5 = Very Hard)
-        </p>
+            </p>
+          </div>
+        </div>
+        <div class="slider-panel">
         <input type="range" min="1" max="5" value="3" id="difficulty-slider">
-        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-top:6px">
+        <div class="range-scale">
           <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px">
+        <div class="range-captions">
           <span>Very Easy</span><span>Very Hard</span>
         </div>
-        <div style="text-align:center;margin-top:10px;font-size:14px;font-weight:700;color:var(--primary)">
+        <div class="difficulty-output">
           Selected: <span id="slider-val">3</span> / 5
+        </div>
         </div>
       </div>
 
       <div class="card" id="sa-card" style="margin-top:16px;display:none">
         <div class="section-title">Short Answer</div>
-        <p id="sa-prompt" style="font-size:14px;color:var(--secondary);margin-bottom:10px;font-weight:600"></p>
+        <p id="sa-prompt" class="question-prompt"></p>
         <textarea class="form-control" id="short-answer" rows="5" placeholder="Write your answer here in complete sentences..."></textarea>
-        <p style="font-size:12px;color:var(--muted);margin-top:6px">This response will be reviewed and scored by your teacher.</p>
+        <p class="micro-copy" style="margin-top:6px">This response will be reviewed and scored by your teacher.</p>
       </div>
 
-      <div style="margin-top:20px;text-align:right">
-        <button class="btn btn-primary" id="submit-btn" onclick="submitAnswers()" style="font-size:15px;padding:12px 28px">Submit Answers</button>
+      <div class="submission-actions">
+        <button class="btn btn-primary" id="submit-btn" onclick="submitAnswers()">Submit Answers</button>
       </div>
     </div>
   </main>
 </div>
 <div class="toast" id="toast"></div>
 <script src="../api.js"></script>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   const params = new URLSearchParams(location.search);
   const pid = params.get("id") || "p3";
@@ -104,7 +111,7 @@
         document.getElementById("q-sub").textContent = "Please go back to your dashboard.";
         document.getElementById("submit-btn").disabled = true;
         document.getElementById("questions-wrap").innerHTML =
-          '<div class="card"><p style="color:var(--hard)">No passage data was found for this assessment.</p></div>';
+          '<div class="card"><div class="surface-note surface-note-danger">No passage data was found for this assessment.</div></div>';
         return;
       }
 
@@ -136,22 +143,21 @@
   function renderNoQuestionsState() {
     wrap.innerHTML =
       '<div class="card">' +
-      '<div style="font-size:15px;font-weight:700;color:var(--secondary);margin-bottom:8px">No assessment questions yet</div>' +
-      '<p style="font-size:14px;color:var(--muted)">Your teacher has not added questions for this passage yet.</p>' +
+      '<h3 class="passage-list-title" style="margin-bottom:8px">No assessment questions yet</h3>' +
+      '<p class="muted-copy">Your teacher has not added questions for this passage yet.</p>' +
       "</div>";
   }
 
   function addTypeBadge(container, question) {
     const row = document.createElement("div");
-    row.style.cssText = "display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap";
+    row.className = "question-badges";
     const levelBadge = document.createElement("span");
     levelBadge.className = "badge badge-primary";
     levelBadge.textContent = question.difficulty;
     row.appendChild(levelBadge);
 
     const typeBadge = document.createElement("span");
-    typeBadge.className = "badge";
-    typeBadge.style.cssText = "background:#f0f4f8;color:var(--secondary)";
+    typeBadge.className = "badge badge-neutral";
     typeBadge.textContent = getQuestionTypeLabel(question.type);
     row.appendChild(typeBadge);
     container.appendChild(row);
@@ -160,13 +166,10 @@
   function renderMCQ(question, index, card) {
     const options = Array.isArray(question.options) ? question.options.filter(Boolean) : [];
     const optWrap = document.createElement("div");
-    optWrap.style.cssText = "display:flex;flex-direction:column;gap:8px";
+    optWrap.className = "question-options";
     options.forEach(function(opt, optionIndex) {
       const lbl = document.createElement("label");
-      lbl.style.cssText =
-        "display:flex;align-items:center;gap:10px;cursor:pointer;" +
-        "padding:10px 14px;border:1.5px solid var(--border);" +
-        "border-radius:8px;font-size:14px;transition:.2s;";
+      lbl.className = "question-option";
       const radio = document.createElement("input");
       radio.type = "radio";
       radio.name = "q" + index;
@@ -183,13 +186,10 @@
 
   function renderTrueFalse(index, card) {
     const optWrap = document.createElement("div");
-    optWrap.style.cssText = "display:flex;flex-direction:column;gap:8px";
+    optWrap.className = "question-options";
     ["true", "false"].forEach(function(value) {
       const lbl = document.createElement("label");
-      lbl.style.cssText =
-        "display:flex;align-items:center;gap:10px;cursor:pointer;" +
-        "padding:10px 14px;border:1.5px solid var(--border);" +
-        "border-radius:8px;font-size:14px;transition:.2s;";
+      lbl.className = "question-option";
       const radio = document.createElement("input");
       radio.type = "radio";
       radio.name = "q" + index;
@@ -231,13 +231,12 @@
 
     qs.forEach(function(question, index) {
       const card = document.createElement("div");
-      card.className = "card";
-      card.style.marginBottom = "14px";
+      card.className = "card question-card";
 
       addTypeBadge(card, question);
 
       const qText = document.createElement("div");
-      qText.style.cssText = "font-weight:700;margin-bottom:12px;color:var(--secondary);font-size:15px";
+      qText.className = "question-prompt";
       qText.textContent = "Q" + (index + 1) + ". " + question.prompt;
       card.appendChild(qText);
 
@@ -380,4 +379,6 @@
 </script>
 </body>
 </html>
+
+
 

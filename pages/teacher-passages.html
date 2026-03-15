@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Passage Library - ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
 </head>
 <body>
 <div class="demo-banner">ReadWise System | Pulo National High School</div>
@@ -16,22 +16,23 @@
       <p>Teacher Portal</p>
     </div>
     <nav>
-      <a href="teacher-dashboard.html"><span class="icon">&#8962;</span> Dashboard</a>
-      <a href="teacher-passages.html" class="active"><span class="icon">&#128214;</span> Passage Library</a>
-      <a href="teacher-submit.html"><span class="icon">&#10133;</span> Submit Passage</a>
-      <a href="teacher-students.html"><span class="icon">&#128101;</span> Students</a>
-      <a href="teacher-recommendations.html"><span class="icon">&#128276;</span> Recommendations</a>
-      <a href="teacher-reports.html"><span class="icon">&#128202;</span> Reports</a>
+      <a href="teacher-dashboard.html"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="teacher-passages.html" class="active"><span class="icon" data-icon="library"></span><span class="nav-label">Passage Library</span></a>
+      <a href="teacher-submit.html"><span class="icon" data-icon="submit"></span><span class="nav-label">Submit Passage</span></a>
+      <a href="teacher-students.html"><span class="icon" data-icon="students"></span><span class="nav-label">Students</span></a>
+      <a href="teacher-recommendations.html"><span class="icon" data-icon="recommendations"></span><span class="nav-label">Recommendations</span></a>
+      <a href="teacher-reports.html"><span class="icon" data-icon="reports"></span><span class="nav-label">Reports</span></a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info"><strong>Ms. Ana Villanueva</strong>Grade 7 English</div>
-      <button class="logout-btn" onclick="logout()">&larr; Logout</button>
+      <button class="logout-btn" onclick="logout()"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
-    <div class="breadcrumb"><a href="teacher-dashboard.html">Dashboard</a> > Passage Library</div>
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
-      <div>
+    <div class="breadcrumb"><a href="teacher-dashboard.html">Dashboard</a> &gt; Passage Library</div>
+    <div class="page-header page-header-split">
+      <div class="page-header-copy">
+        <p class="eyebrow">Library and weekly planning</p>
         <h1>Passage Library</h1>
         <p id="library-summary">Manage passages and weekly class assignments.</p>
       </div>
@@ -39,25 +40,25 @@
     </div>
 
     <div class="card" style="margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap">
-        <div>
-          <div class="section-title" style="margin-bottom:6px">Weekly Class Assignments</div>
-          <p style="font-size:13px;color:var(--muted)">Assign 5 passages per class for each week. Label matching is enforced automatically.</p>
+      <div class="card-header">
+        <div class="card-header-copy">
+          <div class="section-title">Weekly Class Assignments</div>
+          <p class="micro-copy">Assign 5 passages per class for each week. Label matching is enforced automatically.</p>
         </div>
         <div style="min-width:180px">
           <label class="form-label" for="week-selector">Active Week</label>
           <select class="form-control" id="week-selector"></select>
         </div>
       </div>
-      <div class="card-grid card-grid-3" id="assignment-grid" style="margin-top:14px"></div>
+      <div class="card-grid card-grid-3 assignment-grid" id="assignment-grid"></div>
     </div>
 
-    <div id="passage-grid" style="display:flex;flex-direction:column;gap:14px"></div>
+    <div id="passage-grid" class="library-list"></div>
   </main>
 </div>
 <div class="toast" id="toast"></div>
 <script src="../api.js"></script>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   const grid = document.getElementById("passage-grid");
   const summary = document.getElementById("library-summary");
@@ -117,32 +118,32 @@
       }).length;
 
       const card = document.createElement("div");
-      card.className = "card";
-      card.style.borderTop = "4px solid " + color;
+      card.className = "assignment-panel";
+      card.style.setProperty("--tone", color);
 
       const countText = assignedPassages.length + " / " + MAX_WEEKLY_PASSAGES_PER_CLASS + " assigned";
       card.innerHTML =
-        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">' +
-        '<div><div style="font-size:12px;color:var(--muted)">CLASS</div><div style="font-size:18px;font-weight:800;color:' + color + '">' + display + '</div></div>' +
+        '<div class="assignment-panel-header">' +
+        '<div><div class="assignment-panel-subtitle">Class</div><h3 style="color:' + color + '">' + display + '</h3></div>' +
         '<span class="badge badge-primary">' + countText + "</span></div>" +
         (availablePool < MAX_WEEKLY_PASSAGES_PER_CLASS
-          ? '<div style="font-size:12px;color:var(--hard);margin-bottom:8px">Only ' + availablePool + ' matching passage(s) available. Add more to reach 5.</div>'
+          ? '<div class="surface-note surface-note-warn">Only ' + availablePool + ' matching passage(s) available. Add more to reach 5.</div>'
           : "") +
-        '<div id="class_list_' + level + '" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>' +
-        '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<div id="class_list_' + level + '" class="assignment-list"></div>' +
+        '<div class="action-row">' +
         '<button class="btn btn-sm btn-outline" onclick="autofillClass(\'' + level + '\')">Auto Fill to 5</button>' +
-        '<button class="btn btn-sm" style="background:#f0f4f8;color:var(--secondary)" onclick="clearClass(\'' + level + '\')">Clear</button>' +
+        '<button class="btn btn-sm btn-secondary" onclick="clearClass(\'' + level + '\')">Clear</button>' +
         "</div>";
 
       assignmentGrid.appendChild(card);
 
       const listEl = document.getElementById("class_list_" + level);
       if (!assignedPassages.length) {
-        listEl.innerHTML = '<div style="font-size:12px;color:var(--muted)">No passages assigned yet.</div>';
+        listEl.innerHTML = '<div class="assignment-empty">No passages assigned yet.</div>';
       } else {
         listEl.innerHTML = assignedPassages.map(function(passage) {
-          return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px;background:#f7fafc;border-radius:8px">' +
-            '<span style="font-size:12px;color:var(--secondary);font-weight:600">' + escapeHtml(passage.title) + '</span>' +
+          return '<div class="assignment-item">' +
+            '<span class="assignment-item-title">' + escapeHtml(passage.title) + '</span>' +
             '<button class="btn btn-sm btn-danger" onclick="removeFromClass(\'' + level + '\',\'' + passage.id + '\')">Remove</button>' +
             '</div>';
         }).join("");
@@ -156,9 +157,9 @@
 
     if (!passages.length) {
       grid.innerHTML =
-        '<div class="card" style="text-align:center;padding:40px 24px">' +
-        '<div style="font-size:18px;font-weight:700;color:var(--secondary);margin-bottom:10px">No passages saved yet</div>' +
-        '<p style="font-size:14px;color:var(--muted);margin-bottom:18px">Create your first passage and save it after analysis.</p>' +
+        '<div class="card empty-state">' +
+        '<h3>No passages saved yet</h3>' +
+        '<p>Create your first passage, analyze its level, and save it with an assessment so it becomes assignable for the week.</p>' +
         '<a href="teacher-submit.html" class="btn btn-primary">Create Passage</a>' +
         "</div>";
       return;
@@ -180,22 +181,25 @@
       const assignText = isAssigned ? "Assigned to " + classDisplay : "Assign to " + classDisplay + " Class";
 
       return (
-        '<div class="card" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px">' +
-          '<div style="flex:1;min-width:280px">' +
-            '<div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">' +
+        '<div class="card library-card">' +
+          '<div class="library-card-copy">' +
+            '<div class="pill-row">' +
               '<span class="badge ' + badgeClass(passage.label) + '">' + escapeHtml(passage.label) + '</span>' +
               '<span class="badge badge-primary">' + escapeHtml(passage.genre) + "</span>" +
-              '<span style="font-size:11px;color:var(--muted);background:#f0f4f8;padding:2px 8px;border-radius:4px">' + escapeHtml(confidenceText) + "</span>" +
+              '<span class="meta-pill">' + escapeHtml(confidenceText) + "</span>" +
             "</div>" +
-            '<h3 style="font-size:18px;font-weight:700;color:var(--secondary);margin-bottom:6px">' + escapeHtml(passage.title) + "</h3>" +
-            '<p style="font-size:13px;color:var(--muted);margin-bottom:8px">' + passage.words + " words - ~" + passage.time + " min</p>" +
-            '<p style="font-size:13px;color:var(--muted);margin-bottom:8px">Target class: <strong>' + classDisplay + "</strong></p>" +
-            '<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Assessment: ' + escapeHtml(assessmentText) + "</p>" +
-            '<p style="font-size:14px;color:#4a5568;line-height:1.7">' + escapeHtml(preview) + "</p>" +
+            '<h3 class="library-card-title">' + escapeHtml(passage.title) + "</h3>" +
+            '<div class="card-meta-row">' +
+              '<span class="library-card-fact">' + passage.words + " words</span>" +
+              '<span class="library-card-fact">~' + passage.time + ' min</span>' +
+              '<span class="library-card-fact">Target class: ' + classDisplay + '</span>' +
+            "</div>" +
+            '<div class="surface-note">Assessment: <strong>' + escapeHtml(assessmentText) + "</strong></div>" +
+            '<p class="library-card-preview">' + escapeHtml(preview) + "</p>" +
           "</div>" +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">' +
+          '<div class="library-card-actions">' +
             '<button class="btn btn-outline btn-sm" ' + disabled + ' onclick="assignPassage(\'' + passage.id + '\')">' + escapeHtml(assignText) + "</button>" +
-            '<button class="btn btn-sm" style="background:#f0f4f8;color:var(--secondary)" onclick="editPassage(\'' + passage.id + '\')">Edit</button>' +
+            '<button class="btn btn-sm btn-secondary" onclick="editPassage(\'' + passage.id + '\')">Edit</button>' +
             '<button class="btn btn-danger btn-sm" onclick="removePassage(\'' + passage.id + '\')">Delete</button>' +
           "</div>" +
         "</div>"
@@ -349,4 +353,6 @@
 </script>
 </body>
 </html>
+
+
 

@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard - ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -16,28 +16,34 @@
       <h2>ReadWise</h2><p>Student Portal</p>
     </div>
     <nav>
-      <a href="student-profile.html"><span class="icon"></span> My Profile</a>
-      <a href="student-dashboard.html" class="active"><span class="icon"></span> Dashboard</a>
-      <a href="student-passage.html"><span class="icon"></span> My Passage</a>
-      <a href="student-progress.html"><span class="icon"></span> My Progress</a>
-      <a href="student-pre-assessment.html"><span class="icon"></span> Pre-Assessment</a>
+      <a href="student-profile.html"><span class="icon" data-icon="profile"></span><span class="nav-label">My Profile</span></a>
+      <a href="student-dashboard.html" class="active"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="student-passage.html"><span class="icon" data-icon="passage"></span><span class="nav-label">My Passage</span></a>
+      <a href="student-progress.html"><span class="icon" data-icon="progress"></span><span class="nav-label">My Progress</span></a>
+      <a href="student-pre-assessment.html"><span class="icon" data-icon="assessment"></span><span class="nav-label">Pre-Assessment</span></a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info"><strong id="sb-name">-</strong>Grade 7 | Sampaguita</div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
-    <div class="page-header">
-      <h1 id="welcome-msg">Good morning!</h1>
-      <p id="program-week-label">Weekly assignment tracker</p>
+    <div class="page-header page-header-split">
+      <div class="page-header-copy">
+        <p class="eyebrow">Student workspace</p>
+        <h1 id="welcome-msg">Good morning!</h1>
+        <p id="program-week-label">Weekly assignment tracker</p>
+      </div>
+      <div class="header-meta">
+        <span class="meta-pill"><strong>Reading focus</strong> Weekly progress</span>
+      </div>
     </div>
 
     <div class="card-grid card-grid-3" style="margin-bottom:16px">
       <div class="stat-card">
         <div class="stat-label">Current Class Level</div>
         <div id="level-badge" class="level-big" style="margin-top:6px">-</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:6px">Passages are assigned based on this class.</div>
+        <div class="kpi-support">Passages are assigned based on this class.</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Pre-Assessment Score</div>
@@ -52,24 +58,34 @@
         <div class="progress" style="margin-top:8px">
           <div class="progress-bar" id="week-progress-bar" style="background:var(--secondary)"></div>
         </div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px" id="week-progress-text">No passages completed yet.</div>
+        <div class="kpi-support" id="week-progress-text">No passages completed yet.</div>
       </div>
     </div>
 
-    <div id="rec-banner" class="card" style="margin-bottom:16px;border-left:4px solid var(--accent);background:#fffbf5">
+    <div id="rec-banner" class="card recommendation-banner" style="margin-bottom:16px">
       <div>
-        <div style="font-weight:700;color:var(--secondary)">Latest System Recommendation</div>
-        <div id="rec-text" style="font-size:14px;color:var(--muted);margin-top:3px">-</div>
+        <div class="section-title" style="margin-bottom:6px">Latest System Recommendation</div>
+        <div id="rec-text" class="muted-copy">-</div>
       </div>
     </div>
 
     <div class="card-grid card-grid-2">
       <div class="card">
-        <div class="section-title">This Week's Assigned Passages</div>
+        <div class="card-header">
+          <div class="card-header-copy">
+            <div class="section-title">This Week's Assigned Passages</div>
+            <div class="micro-copy">Open your next passage and keep your weekly momentum going.</div>
+          </div>
+        </div>
         <div id="weekly-passages-list"></div>
       </div>
       <div class="card">
-        <div class="section-title">Weekly Score History</div>
+        <div class="card-header">
+          <div class="card-header-copy">
+            <div class="section-title">Weekly Score History</div>
+            <div class="micro-copy">A quick view of how your recent comprehension scores are trending.</div>
+          </div>
+        </div>
         <div class="chart-wrap"><canvas id="miniChart"></canvas></div>
       </div>
     </div>
@@ -77,7 +93,7 @@
 </div>
 <div class="toast" id="toast"></div>
 <script src="../api.js"></script>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   function scoreColor(score) {
     if (score >= 65) return levelColor("EASY");
@@ -150,7 +166,7 @@
     const list = document.getElementById("weekly-passages-list");
     if (!weeklyPassages.length) {
       list.innerHTML =
-        '<div style="padding:12px;background:#fff3cd;border-radius:8px;color:var(--secondary);font-size:13px">' +
+        '<div class="surface-note surface-note-warn">' +
         "No weekly passages assigned yet for your class. Please check back soon." +
         "</div>";
     } else {
@@ -160,12 +176,18 @@
           ? '<span class="badge badge-easy">Completed</span>'
           : '<span class="badge badge-moderate">Pending</span>';
         return (
-          '<div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:#fff">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">' +
-              '<strong style="color:var(--secondary)">#' + (index + 1) + " " + passage.title + "</strong>" +
+          '<div class="passage-list-card">' +
+            '<div class="passage-list-header">' +
+              '<div>' +
+                '<p class="micro-copy" style="margin:0 0 6px">Passage ' + (index + 1) + " of " + weeklyPassages.length + "</p>" +
+                '<h3 class="passage-list-title">' + passage.title + "</h3>" +
+              "</div>" +
               statusBadge +
             "</div>" +
-            '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">' + passage.words + " words - ~" + passage.time + " min</div>" +
+            '<div class="card-meta-row">' +
+              '<span class="library-card-fact">' + passage.words + " words</span>" +
+              '<span class="library-card-fact">~' + passage.time + ' min</span>' +
+            "</div>" +
             '<a class="btn btn-primary btn-sm" href="student-reading.html?id=' + passage.id + '">Open Passage</a>' +
           "</div>"
         );
@@ -217,4 +239,6 @@
 </script>
 </body>
 </html>
+
+
 

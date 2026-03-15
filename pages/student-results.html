@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Results - ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
 </head>
 <body>
 <div class="demo-banner">ReadWise System | Pulo National High School</div>
@@ -14,32 +14,33 @@
       <div class="logo-mark">RW</div><h2>ReadWise</h2><p>Student Portal</p>
     </div>
     <nav>
-      <a href="student-profile.html"><span class="icon">&#128100;</span> My Profile</a>
-      <a href="student-dashboard.html"><span class="icon">&#8962;</span> Dashboard</a>
-      <a href="student-passage.html" class="active"><span class="icon">&#128214;</span> My Passage</a>
-      <a href="student-progress.html"><span class="icon">&#128202;</span> My Progress</a>
-      <a href="student-pre-assessment.html"><span class="icon">&#128221;</span> Pre-Assessment</a>
+      <a href="student-profile.html"><span class="icon" data-icon="profile"></span><span class="nav-label">My Profile</span></a>
+      <a href="student-dashboard.html"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="student-passage.html" class="active"><span class="icon" data-icon="passage"></span><span class="nav-label">My Passage</span></a>
+      <a href="student-progress.html"><span class="icon" data-icon="progress"></span><span class="nav-label">My Progress</span></a>
+      <a href="student-pre-assessment.html"><span class="icon" data-icon="assessment"></span><span class="nav-label">Pre-Assessment</span></a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info"><strong id="sb-name">-</strong>Grade 7</div>
-      <button class="logout-btn" onclick="logout()">&larr; Logout</button>
+      <button class="logout-btn" onclick="logout()"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
-    <div style="max-width:640px;margin:0 auto">
+    <div class="results-shell">
       <div class="page-header">
+        <p class="eyebrow">Session summary</p>
         <h1>Your Results</h1>
         <p id="result-sub">Session completed</p>
       </div>
 
-      <div class="card" style="text-align:center;margin-bottom:16px;padding:32px">
-        <div style="font-size:56px;font-weight:900;color:var(--secondary)" id="score-big">-%</div>
-        <div id="score-label" style="font-size:18px;margin:8px 0;font-weight:700"></div>
-        <div id="score-fraction" style="font-size:14px;color:var(--muted)"></div>
+      <div class="card result-hero" style="margin-bottom:16px">
+        <div class="result-score" id="score-big">-%</div>
+        <div id="score-label" class="result-label"></div>
+        <div id="score-fraction" class="result-summary"></div>
         <div class="progress" style="margin:16px 0;height:14px">
           <div class="progress-bar" id="score-bar" style="background:var(--primary)"></div>
         </div>
-        <div id="reading-time" style="font-size:13px;color:var(--muted)"></div>
+        <div id="reading-time" class="micro-copy"></div>
       </div>
 
       <div class="card-grid card-grid-2" style="margin-bottom:16px">
@@ -55,16 +56,16 @@
 
       <div class="card" style="margin-bottom:16px">
         <div class="section-title">Weekly Assignment Status</div>
-        <div id="week-status" style="font-size:14px;color:var(--secondary)"></div>
+        <div id="week-status" class="surface-note"></div>
       </div>
 
       <div class="card" id="sa-section" style="margin-bottom:16px;display:none">
         <div class="section-title">Your Short Answer</div>
-        <div id="sa-display" style="font-size:14px;color:var(--text);line-height:1.7;background:#f7fafc;padding:12px;border-radius:8px"></div>
-        <div style="margin-top:10px;font-size:13px;color:var(--muted)">Pending teacher scoring (0-3 points)</div>
+        <div id="sa-display" class="result-short-answer"></div>
+        <div class="micro-copy" style="margin-top:10px">Pending teacher scoring (0-3 points)</div>
       </div>
 
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div class="action-row">
         <a href="student-dashboard.html" class="btn btn-primary">Back to Dashboard</a>
         <a href="student-passage.html" class="btn btn-outline">View Weekly Passages</a>
       </div>
@@ -72,7 +73,7 @@
   </main>
 </div>
 <script src="../api.js"></script>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   const params = new URLSearchParams(location.search);
   const pid = params.get("id") || "p3";
@@ -120,8 +121,7 @@
     else if (result.score >= 60) { recommendation = "Maintain"; recColor = "var(--accent)"; }
     else { recommendation = "Step DOWN"; recColor = "var(--hard)"; }
     document.getElementById("rec-badge").innerHTML =
-      '<span style="font-size:16px;font-weight:800;color:' + recColor + '">' + recommendation + '</span>' +
-      '<div style="font-size:12px;color:var(--muted);margin-top:4px">Based on your score</div>';
+      '<div class="result-recommendation"><strong style="color:' + recColor + '">' + recommendation + '</strong><div class="micro-copy">Based on your score</div></div>';
 
     if (result.shortAnswer) {
       document.getElementById("sa-section").style.display = "block";
@@ -157,4 +157,6 @@
 </script>
 </body>
 </html>
+
+
 

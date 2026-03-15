@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Progress â€” ReadWise</title>
- <link rel="stylesheet" href="../stylesheets/shared.css">
+  <title>My Progress - ReadWise</title>
+ <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -16,42 +16,42 @@
       <div class="logo-mark">RW</div><h2>ReadWise</h2><p>Student Portal</p>
     </div>
     <nav>
-        <a href="student-profile.html"><span class="icon">ðŸ‘¤</span> My Profile</a>
-      <a href="student-dashboard.html"><span class="icon">ðŸ </span> Dashboard</a>
-      <a href="student-passage.html"><span class="icon">ðŸ“–</span> My Passage</a>
-      <a href="student-progress.html" class="active"><span class="icon">ðŸ“Š</span> My Progress</a>
-      <a href="student-pre-assessment.html"><span class="icon">ðŸ“</span> Pre-Assessment</a>
+        <a href="student-profile.html"><span class="icon" data-icon="profile"></span><span class="nav-label">My Profile</span></a>
+      <a href="student-dashboard.html"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="student-passage.html"><span class="icon" data-icon="passage"></span><span class="nav-label">My Passage</span></a>
+      <a href="student-progress.html" class="active"><span class="icon" data-icon="progress"></span><span class="nav-label">My Progress</span></a>
+      <a href="student-pre-assessment.html"><span class="icon" data-icon="assessment"></span><span class="nav-label">Pre-Assessment</span></a>
     </nav>
     <div class="sidebar-footer">
-      <div class="user-info"><strong id="sb-name">â€”</strong>Grade 7</div>
-      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'">â¬… Logout</button>
+      <div class="user-info"><strong id="sb-name">-</strong>Grade 7</div>
+      <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='../login.html'"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
     <div class="page-header">
-      <h1>ðŸ“Š My Progress Tracker</h1>
+      <h1>My Progress Tracker</h1>
       <p>Weekly reading scores and difficulty recommendations</p>
     </div>
     <div class="card-grid card-grid-3" style="margin-bottom:16px">
       <div class="stat-card">
         <div class="stat-label">Current Level</div>
-        <div id="cur-level" class="level-big" style="margin-top:6px;font-size:16px">â€”</div>
+        <div id="cur-level" class="level-big" style="margin-top:6px;font-size:16px">-</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Best Score</div>
-        <div class="stat-val" id="best-score">â€”%</div>
+        <div class="stat-val" id="best-score">-%</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Latest Score</div>
-        <div class="stat-val" id="latest-score">â€”%</div>
+        <div class="stat-val" id="latest-score">-%</div>
       </div>
     </div>
     <div class="card" style="margin-bottom:16px">
-      <div class="section-title">ðŸ“ˆ Score Trend (Weeks 1â€“4)</div>
+      <div class="section-title">Score Trend (Weeks 1-4)</div>
       <div class="chart-wrap" style="height:260px"><canvas id="progressChart"></canvas></div>
     </div>
     <div class="card">
-      <div class="section-title">ðŸ“‹ Session History & Recommendations</div>
+      <div class="section-title">Session History and Recommendations</div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -63,7 +63,7 @@
     </div>
   </main>
 </div>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   const s = getCurrentStudent();
   document.getElementById("sb-name").textContent = s.name;
@@ -123,4 +123,6 @@
 </script>
 </body>
 </html>
+
+
 

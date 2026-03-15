@@ -24,6 +24,7 @@ DB_PORT = int(os.environ.get("READWISE_DB_PORT", "3306"))
 DB_USER = os.environ.get("READWISE_DB_USER", "root")
 DB_PASSWORD = os.environ.get("READWISE_DB_PASSWORD", "")
 DB_NAME = os.environ.get("READWISE_DB_NAME", "readwise_db")
+PRESET_AVATAR_PATTERN = re.compile(r"^/readwise/avatar/[A-Za-z0-9 _().-]+\.svg$")
 
 if not re.fullmatch(r"[A-Za-z0-9_]+", DB_NAME):
     raise RuntimeError("Invalid READWISE_DB_NAME")
@@ -97,6 +98,34 @@ def normalize_class_level(value):
     return v if v in {"EASY", "MODERATE", "HARD"} else "EASY"
 
 
+def normalize_avatar_type(value):
+    v = str(value or "initials").strip().lower()
+    return v if v in {"initials", "preset", "upload"} else None
+
+
+def sanitize_avatar_value(avatar_type, value):
+    if avatar_type == "initials":
+        return None
+
+    avatar_value = str(value or "").strip()
+    if not avatar_value:
+        raise ValueError("avatarValue is required.")
+
+    if avatar_type == "preset":
+        if not PRESET_AVATAR_PATTERN.fullmatch(avatar_value):
+            raise ValueError("Invalid preset avatar.")
+        return avatar_value
+
+    if avatar_type == "upload":
+        if not avatar_value.startswith("data:image/"):
+            raise ValueError("Invalid uploaded avatar.")
+        if len(avatar_value) > 8_000_000:
+            raise ValueError("Uploaded avatar is too large.")
+        return avatar_value
+
+    raise ValueError("Invalid avatarType.")
+
+
 def normalize_week(value):
     try:
         week = int(value)
@@ -150,21 +179,27 @@ def db_cursor(dictionary=False):
         cur.close()
         conn.close()
 
+
+def fetch_user_by_id(cur, user_id):
+    cur.execute(
+        """
+        SELECT u.id,u.email,u.role,u.is_active,
+               s.id AS student_id,s.full_name,s.grade,s.section,s.class_level,s.pre_score,
+               s.avatar_type,s.avatar_value
+        FROM users u LEFT JOIN students s ON s.user_id=u.id
+        WHERE u.id=%s
+        """,
+        (user_id,),
+    )
+    return cur.fetchone()
+
+
 def current_user():
     uid = session.get("user_id")
     if not uid:
         return None
     with db_cursor(True) as (_, cur):
-        cur.execute(
-            """
-            SELECT u.id,u.email,u.role,u.is_active,
-                   s.id AS student_id,s.full_name,s.grade,s.section,s.class_level,s.pre_score
-            FROM users u LEFT JOIN students s ON s.user_id=u.id
-            WHERE u.id=%s
-            """,
-            (uid,),
-        )
-        row = cur.fetchone()
+        row = fetch_user_by_id(cur, uid)
         if not row or not row.get("is_active"):
             return None
         return row
@@ -196,6 +231,8 @@ def serialize_user(row):
             "section": row.get("section"),
             "classLevel": row.get("class_level"),
             "preScore": row.get("pre_score"),
+            "avatarType": row.get("avatar_type") or "initials",
+            "avatarValue": row.get("avatar_value") or "",
         }
     return {"id": row["id"], "email": row["email"], "role": row["role"], "student": student}
 
@@ -340,7 +377,7 @@ def init_database():
     with db_cursor(True) as (_, cur):
         schema = [
             """CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY,email VARCHAR(255) UNIQUE NOT NULL,password_hash VARCHAR(255) NOT NULL,role ENUM('teacher','student') NOT NULL,is_active TINYINT(1) NOT NULL DEFAULT 1,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4""",
-            """CREATE TABLE IF NOT EXISTS students (id VARCHAR(20) PRIMARY KEY,user_id INT UNIQUE NOT NULL,full_name VARCHAR(255) NOT NULL,grade VARCHAR(20) NOT NULL,section VARCHAR(100) NOT NULL,class_level ENUM('EASY','MODERATE','HARD') NOT NULL DEFAULT 'EASY',pre_score INT NOT NULL DEFAULT 0,FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4""",
+            """CREATE TABLE IF NOT EXISTS students (id VARCHAR(20) PRIMARY KEY,user_id INT UNIQUE NOT NULL,full_name VARCHAR(255) NOT NULL,grade VARCHAR(20) NOT NULL,section VARCHAR(100) NOT NULL,class_level ENUM('EASY','MODERATE','HARD') NOT NULL DEFAULT 'EASY',pre_score INT NOT NULL DEFAULT 0,avatar_type ENUM('initials','preset','upload') NOT NULL DEFAULT 'initials',avatar_value MEDIUMTEXT NULL,FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4""",
             """CREATE TABLE IF NOT EXISTS passages (id VARCHAR(20) PRIMARY KEY,title VARCHAR(255) NOT NULL,genre VARCHAR(100) NOT NULL,text MEDIUMTEXT NOT NULL,label ENUM('EASY','MODERATE','HARD') NOT NULL,words INT NOT NULL,est_minutes INT NOT NULL,confidence DECIMAL(5,2) NULL,created_by INT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4""",
             """CREATE TABLE IF NOT EXISTS assessments (id INT AUTO_INCREMENT PRIMARY KEY,passage_id VARCHAR(20) UNIQUE NOT NULL,short_answer_prompt TEXT NULL,FOREIGN KEY (passage_id) REFERENCES passages(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4""",
             """CREATE TABLE IF NOT EXISTS assessment_questions (id INT AUTO_INCREMENT PRIMARY KEY,assessment_id INT NOT NULL,sort_order INT NOT NULL DEFAULT 0,difficulty ENUM('EASY','MODERATE','DIFFICULT','CUSTOM') NOT NULL DEFAULT 'EASY',type VARCHAR(60) NOT NULL,prompt TEXT NOT NULL,options_json JSON NULL,answer_index INT NULL,answer_key VARCHAR(255) NULL,answer_keys_json JSON NULL,FOREIGN KEY (assessment_id) REFERENCES assessments(id) ON DELETE CASCADE,INDEX idx_q_sort (assessment_id, sort_order)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4""",
@@ -350,6 +387,18 @@ def init_database():
         ]
         for sql in schema:
             cur.execute(sql)
+
+        cur.execute("SHOW COLUMNS FROM students LIKE 'avatar_type'")
+        if not cur.fetchone():
+            cur.execute(
+                "ALTER TABLE students ADD COLUMN avatar_type ENUM('initials','preset','upload') NOT NULL DEFAULT 'initials' AFTER pre_score"
+            )
+
+        cur.execute("SHOW COLUMNS FROM students LIKE 'avatar_value'")
+        if not cur.fetchone():
+            cur.execute(
+                "ALTER TABLE students ADD COLUMN avatar_value MEDIUMTEXT NULL AFTER avatar_type"
+            )
 
         def upsert_user(email, password, role):
             cur.execute("SELECT id FROM users WHERE email=%s", (email,))
@@ -500,7 +549,8 @@ def auth_login():
         cur.execute(
             """
             SELECT u.id,u.email,u.password_hash,u.role,u.is_active,
-                   s.id AS student_id,s.full_name,s.grade,s.section,s.class_level,s.pre_score
+                   s.id AS student_id,s.full_name,s.grade,s.section,s.class_level,s.pre_score,
+                   s.avatar_type,s.avatar_value
             FROM users u LEFT JOIN students s ON s.user_id=u.id
             WHERE u.email=%s
             """,
@@ -534,6 +584,36 @@ def auth_me():
     if err:
         return err
     return api_ok({"user": serialize_user(user)})
+
+
+@app.put("/api/student/profile/avatar")
+def student_profile_avatar_update():
+    user, err = require_role("student")
+    if err:
+        return err
+
+    payload = request.get_json(silent=True) or {}
+    avatar_type = normalize_avatar_type(payload.get("avatarType"))
+    if not avatar_type:
+        return api_error("avatarType must be initials, preset, or upload.", 400)
+
+    try:
+        avatar_value = sanitize_avatar_value(avatar_type, payload.get("avatarValue"))
+    except ValueError as error:
+        return api_error(str(error), 400)
+
+    with db_cursor(True) as (_, cur):
+        student = student_row(cur, user)
+        if not student:
+            return api_error("Student profile not found.", 404)
+
+        cur.execute(
+            "UPDATE students SET avatar_type=%s, avatar_value=%s WHERE id=%s",
+            (avatar_type, avatar_value, student["id"]),
+        )
+        refreshed_user = fetch_user_by_id(cur, user["id"])
+
+    return api_ok({"user": serialize_user(refreshed_user)})
 
 @app.get("/api/passages")
 def passages_list():

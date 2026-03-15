@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Submit Passage - ReadWise</title>
-  <link rel="stylesheet" href="../stylesheets/shared.css">
+  <link rel="stylesheet" href="../stylesheets/shared.css?v=20260316b">
 </head>
 <body>
 <div class="demo-banner">ReadWise System | Pulo National High School</div>
@@ -16,27 +16,31 @@
       <p>Teacher Portal</p>
     </div>
     <nav>
-      <a href="teacher-dashboard.html"><span class="icon">&#8962;</span> Dashboard</a>
-      <a href="teacher-passages.html"><span class="icon">&#128214;</span> Passage Library</a>
-      <a href="teacher-submit.html" class="active"><span class="icon">&#10133;</span> Submit Passage</a>
-      <a href="teacher-students.html"><span class="icon">&#128101;</span> Students</a>
-      <a href="teacher-recommendations.html"><span class="icon">&#128276;</span> Recommendations</a>
-      <a href="teacher-reports.html"><span class="icon">&#128202;</span> Reports</a>
+      <a href="teacher-dashboard.html"><span class="icon" data-icon="dashboard"></span><span class="nav-label">Dashboard</span></a>
+      <a href="teacher-passages.html"><span class="icon" data-icon="library"></span><span class="nav-label">Passage Library</span></a>
+      <a href="teacher-submit.html" class="active"><span class="icon" data-icon="submit"></span><span class="nav-label">Submit Passage</span></a>
+      <a href="teacher-students.html"><span class="icon" data-icon="students"></span><span class="nav-label">Students</span></a>
+      <a href="teacher-recommendations.html"><span class="icon" data-icon="recommendations"></span><span class="nav-label">Recommendations</span></a>
+      <a href="teacher-reports.html"><span class="icon" data-icon="reports"></span><span class="nav-label">Reports</span></a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info"><strong>Ms. Ana Villanueva</strong>Grade 7 English</div>
-      <button class="logout-btn" onclick="logout()">&larr; Logout</button>
+      <button class="logout-btn" onclick="logout()"><span class="icon" data-icon="logout"></span><span class="nav-label">Logout</span></button>
     </div>
   </aside>
   <main class="main">
-    <div class="breadcrumb"><a href="teacher-dashboard.html">Dashboard</a> > <a href="teacher-passages.html">Passage Library</a> > <span id="crumb-mode">Submit Passage</span></div>
+    <div class="breadcrumb"><a href="teacher-dashboard.html">Dashboard</a> &gt; <a href="teacher-passages.html">Passage Library</a> &gt; <span id="crumb-mode">Submit Passage</span></div>
     <div class="page-header">
+      <p class="eyebrow">Analysis and authoring</p>
       <h1 id="page-title">Submit New Passage</h1>
-      <p id="page-subtitle">Paste a reading passage and let the SVM classifier predict its difficulty level.</p>
+      <p id="page-subtitle">Paste a reading passage, build its assessment, and let the SVM classifier recommend the reading level before saving.</p>
     </div>
     <div class="card-grid card-grid-2">
       <div class="card">
-        <div class="section-title">Passage Input</div>
+        <div class="editor-intro">
+          <div class="section-title">Passage Input</div>
+          <div class="micro-copy">Prepare the passage content and the assessment in one guided teacher workflow.</div>
+        </div>
         <div class="form-group">
           <label class="form-label" for="passage-title">Passage Title</label>
           <input class="form-control" id="passage-title" placeholder="e.g. The Solar System">
@@ -56,28 +60,31 @@
         </div>
 
         <div class="section-title">Assessment Builder</div>
-        <p style="font-size:13px;color:var(--muted);margin:-6px 0 10px 0">
+        <div class="helper-note surface-note-accent">
           Easy: Multiple Choice, True/False | Moderate: MCQ Harder, True/False Modified, Sequence |
           Difficult: Fill in the Blanks, Identification, Enumeration | Custom: Custom Question
-        </p>
-        <div id="assessment-builder" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px"></div>
+        </div>
+        <div id="assessment-builder" class="stack-sm" style="margin:12px 0 10px"></div>
         <button class="btn btn-outline btn-sm" type="button" onclick="addQuestionField()">+ Add Question</button>
         <div class="form-group" style="margin-top:12px">
           <label class="form-label" for="short-answer-prompt">Optional Short Answer Prompt</label>
           <textarea class="form-control" id="short-answer-prompt" rows="3" placeholder="Optional teacher-scored prompt."></textarea>
         </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="action-row">
           <button class="btn btn-primary" id="analyze-btn" onclick="analyzePassage()">Analyze Passage (SVM)</button>
           <a class="btn btn-outline" href="teacher-passages.html">Back to Library</a>
         </div>
       </div>
       <div class="card">
-        <div class="section-title">SVM Prediction Results</div>
+        <div class="editor-intro">
+          <div class="section-title">SVM Prediction Results</div>
+          <div class="micro-copy">Review the recommended difficulty, passage features, and optional override before saving.</div>
+        </div>
         <div id="result-content">
-          <div style="text-align:center;padding:40px 0;color:var(--muted)">
-            <div style="font-size:20px;font-weight:700;margin-bottom:12px">Prediction Ready</div>
-            <p>Analyze the passage, then save with your assessment.</p>
-            <p style="font-size:12px;margin-top:12px">API: http://localhost:5000/predict</p>
+          <div class="prediction-placeholder muted-copy">
+            <div class="header-kicker">Prediction Ready</div>
+            <p>Analyze the passage, then save it with the assessment attached.</p>
+            <div class="micro-copy">API: http://localhost:5000/predict</div>
           </div>
         </div>
       </div>
@@ -86,7 +93,7 @@
 </div>
 <div class="toast" id="toast"></div>
 <script src="../api.js"></script>
-<script src="../mockData.js"></script>
+<script src="../mockData.js?v=20260316b"></script>
 <script>
   const PREDICTION_API_URL = ReadWiseAPI.baseUrl + "/predict";
   const pageParams = new URLSearchParams(window.location.search);
@@ -149,7 +156,6 @@
       const wrap = document.createElement("div");
       const l = document.createElement("label");
       l.className = "form-label";
-      l.style.marginBottom = "2px";
       l.textContent = label;
       const input = document.createElement("input");
       input.className = "form-control";
@@ -171,7 +177,6 @@
       const l = document.createElement("label");
       l.className = "form-label";
       l.textContent = "Correct Option";
-      l.style.marginTop = "8px";
       const select = document.createElement("select");
       select.className = "form-control";
       ["A","B","C","D"].forEach(function(letter, answerIndex) {
@@ -191,7 +196,6 @@
       const l = document.createElement("label");
       l.className = "form-label";
       l.textContent = "Correct Answer";
-      l.style.marginTop = "8px";
       const select = document.createElement("select");
       select.className = "form-control";
       [{v:"true",t:"True"},{v:"false",t:"False"}].forEach(function(entry) {
@@ -240,16 +244,15 @@
       assessmentDraft[index] = q;
 
       const card = document.createElement("div");
-      card.style.cssText = "border:1px solid var(--border);border-radius:8px;padding:12px;background:#f7fafc";
+      card.className = "question-editor";
 
       const header = document.createElement("div");
-      header.style.cssText = "display:flex;justify-content:space-between;align-items:center;margin-bottom:8px";
-      header.innerHTML = "<strong style='color:var(--secondary)'>Question " + (index + 1) + "</strong>";
+      header.className = "question-editor-header";
+      header.innerHTML = "<strong>Question " + (index + 1) + "</strong>";
       if (assessmentDraft.length > 1) {
         const remove = document.createElement("button");
         remove.type = "button";
-        remove.className = "btn btn-sm";
-        remove.style.cssText = "background:#fde8e8;color:var(--hard)";
+        remove.className = "btn btn-danger btn-sm";
         remove.textContent = "Remove";
         remove.onclick = function() { removeQuestionField(index); };
         header.appendChild(remove);
@@ -257,7 +260,7 @@
       card.appendChild(header);
 
       const row = document.createElement("div");
-      row.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px";
+      row.className = "question-editor-grid";
       const levelWrap = document.createElement("div");
       const levelLabel = document.createElement("label");
       levelLabel.className = "form-label";
@@ -318,7 +321,7 @@
       card.appendChild(prompt);
 
       const body = document.createElement("div");
-      body.style.marginTop = "8px";
+      body.className = "stack-sm";
       renderDynamicFields(body, q, index);
       card.appendChild(body);
       container.appendChild(card);
@@ -385,14 +388,14 @@
 
   function renderLoadingState() {
     document.getElementById("result-content").innerHTML =
-      '<div style="text-align:center;padding:40px 0"><div class="spinner"></div><p style="margin-top:16px;color:var(--muted);font-size:14px">Running SVM classifier...</p></div>';
+      '<div class="loading-panel"><div class="spinner"></div><div class="micro-copy">Running SVM classifier...</div></div>';
   }
 
   function renderErrorState(message) {
     document.getElementById("result-content").innerHTML =
-      '<div style="background:#fde8e8;border-radius:8px;padding:16px;color:var(--hard)"><div style="font-size:14px;font-weight:700;margin-bottom:8px">Prediction unavailable</div><div style="font-size:13px;line-height:1.6">' +
+      '<div class="error-panel surface-note surface-note-danger"><div class="section-title">Prediction unavailable</div><div>' +
       escapeHtml(message) +
-      '</div><div style="font-size:12px;color:var(--muted);margin-top:12px">Start the local Flask server with: python app.py</div></div>';
+      '</div><div class="micro-copy">Start the local Flask server with: python app.py</div></div>';
   }
 
   function renderResult(data, options) {
@@ -403,17 +406,19 @@
     const saveLabel = currentPassageId ? "Update Passage" : "Save to Passage Library";
     const heading = settings.saved ? "CURRENT SAVED LABEL" : "PREDICTED LABEL";
     document.getElementById("result-content").innerHTML =
-      '<div style="text-align:center;margin-bottom:20px">' +
-      '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">' + heading + '</div>' +
-      '<span class="badge ' + badgeClass(data.label) + '" style="font-size:22px;padding:10px 28px">' + label + '</span>' +
-      '<div style="font-size:13px;color:var(--muted);margin-top:10px">Confidence: ' + confidenceText + '</div>' +
+      '<div class="prediction-placeholder">' +
+      '<div class="section-title">' + heading + '</div>' +
+      '<span class="badge prediction-hero-badge ' + badgeClass(data.label) + '">' + label + '</span>' +
+      '<div class="micro-copy">Confidence: ' + confidenceText + '</div>' +
       '</div>' +
-      '<div style="background:#f7fafc;border-radius:8px;padding:16px;margin-bottom:16px">' +
-      '<div style="font-size:13px;font-weight:700;color:var(--secondary);margin-bottom:12px">Feature Breakdown</div>' +
-      '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--muted)">Avg Sentence Length</span><strong>' + escapeHtml((features.avg_sentence_length || 0) + " words") + '</strong></div>' +
-      '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--muted)">Avg Word Length</span><strong>' + escapeHtml((features.avg_word_length || 0) + " characters") + '</strong></div>' +
-      '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--muted)">Type-Token Ratio</span><strong>' + escapeHtml(features.type_token_ratio || 0) + '</strong></div>' +
-      '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--muted)">Passage Length</span><strong>' + escapeHtml((features.passage_length || 0) + " words") + '</strong></div>' +
+      '<div class="feature-panel" style="margin-bottom:16px">' +
+      '<div class="section-title">Feature Breakdown</div>' +
+      '<div class="feature-list">' +
+      '<div class="feature-row"><span class="feature-label">Avg Sentence Length</span><strong class="feature-value">' + escapeHtml((features.avg_sentence_length || 0) + " words") + '</strong></div>' +
+      '<div class="feature-row"><span class="feature-label">Avg Word Length</span><strong class="feature-value">' + escapeHtml((features.avg_word_length || 0) + " characters") + '</strong></div>' +
+      '<div class="feature-row"><span class="feature-label">Type-Token Ratio</span><strong class="feature-value">' + escapeHtml(features.type_token_ratio || 0) + '</strong></div>' +
+      '<div class="feature-row"><span class="feature-label">Passage Length</span><strong class="feature-value">' + escapeHtml((features.passage_length || 0) + " words") + '</strong></div>' +
+      '</div>' +
       '</div>' +
       '<div class="form-group"><label class="form-label" for="override-label">Override Label (Optional)</label>' +
       '<select class="form-control" id="override-label"><option value="">Use ' + (settings.saved ? "Current" : "Predicted") + ': ' + label + '</option><option>EASY</option><option>MODERATE</option><option>HARD</option></select></div>' +
@@ -458,7 +463,7 @@
     renderLoadingState();
     const button = document.getElementById("analyze-btn");
     button.disabled = true;
-    button.style.opacity = "0.7";
+    button.classList.add("is-loading");
     button.textContent = "Analyzing...";
 
     try {
@@ -478,7 +483,7 @@
       showToast(error.message || "Cannot connect to prediction server.", "#c0392b");
     } finally {
       button.disabled = false;
-      button.style.opacity = "1";
+      button.classList.remove("is-loading");
       button.textContent = "Analyze Passage (SVM)";
     }
   }
@@ -553,4 +558,6 @@
 </script>
 </body>
 </html>
+
+
 

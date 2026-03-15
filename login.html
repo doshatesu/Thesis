@@ -4,38 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link rel="stylesheet" href="stylesheets/login.css">
+  <link rel="stylesheet" href="stylesheets/login.css?v=20260316b">
 </head>
 <body>
   <div class="background">
-    <div class="container">
-      <div class="card">
-        <div class="card-intro">
-          <p class="eyebrow">ReadWise</p>
-          <h1 class="title">Sign in</h1>
-          <p class="subtitle">Choose your portal and continue with weekly reading passages, assessments, and class progress.</p>
-        </div>
+    <div class="auth-shell">
+      <div class="login-card">
+        <section class="login-form-panel" aria-label="Sign in">
+          <div class="card-intro">
+            <p class="eyebrow">Welcome back</p>
+            <h2 class="form-title">Choose your portal</h2>
+            <p class="form-subtitle">Sign in to continue with your weekly reading work, teaching dashboard, and class progress tools.</p>
+          </div>
 
-        <div class="toggle-container">
-          <button id="studentBtn" class="toggle-button active" type="button">Student</button>
-          <button id="teacherBtn" class="toggle-button" type="button">Teacher</button>
-        </div>
+          <div class="toggle-container" role="tablist" aria-label="Portal selection">
+            <button id="studentBtn" class="toggle-button active" type="button" role="tab" aria-selected="true">Student</button>
+            <button id="teacherBtn" class="toggle-button" type="button" role="tab" aria-selected="false">Teacher</button>
+          </div>
 
-        <label class="field-group" for="email">
-          <span class="field-label">Email</span>
-          <input type="email" id="email" class="input" placeholder="name@school.edu">
-        </label>
-        <label class="field-group" for="password">
-          <span class="field-label">Password</span>
-          <input type="password" id="password" class="input" placeholder="Enter your password">
-        </label>
+          <label class="field-group" for="email">
+            <span class="field-label">School Email</span>
+            <div class="input-wrap">
+              <input type="email" id="email" class="input" placeholder="name@school.edu" autocomplete="email" inputmode="email">
+            </div>
+          </label>
+          <label class="field-group" for="password">
+            <span class="field-label">Password</span>
+            <div class="input-wrap">
+              <input type="password" id="password" class="input" placeholder="Enter your password" autocomplete="current-password">
+              <button id="togglePasswordBtn" class="password-toggle" type="button" aria-label="Show password">Show</button>
+            </div>
+          </label>
 
-        <button id="loginBtn" class="button">Login</button>
+          <p id="loginError" class="login-error" hidden></p>
+
+          <button id="loginBtn" class="button">Sign In</button>
+
+         
+        </section>
       </div>
     </div>
   </div>
 
-  <script src="api.js"></script>
-  <script src="login.js"></script>
+  <script src="api.js?v=20260316b"></script>
+  <script src="login.js?v=20260316b"></script>
 </body>
 </html>
